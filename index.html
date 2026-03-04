@@ -1,25 +1,43 @@
 <!doctype html>
-<html lang="en">
+<html ng-app="landingApp">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./styles/nav.css" />
-    <title>Landing Page</title>
-    <script src="app.js"></script>
-
+    <title>PillStack Landing Page</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <link rel="stylesheet" href="../views/styles/landingPage.css" />
   </head>
-  <body ng-app="productApp">
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top px-5">
-      <a class="navbar-brand mx-auto fw-light" href="#">WILLA</a>
-    </nav>
 
+  <body ng-controller="LandingController">
+    <div class="header">
+      <div class="logo">
+        <img src="../views/assets/logo2.png" alt="PillStack Logo" />
+      </div>
+      <div class="nav-buttons">
+        <button class="login-btn" ng-click="navigate('login.html')">Login</button>
+        <button class="signup-btn" ng-click="navigate('patient-register')">
+          Sign Up
+        </button>
+      </div>
+    </div>
 
-    <div ng-view></div>
+    <div class="hero">
+      <div class="hero-text">
+        <h1>"Empowering Your Health Journey, One Click Away!"</h1>
+        <p>
+          Your Trusted Online Clinic & Pharmacy for Convenient Care & Medication
+          Solutions.
+        </p>
+      </div>
+      <div class="hero-phone">
+        <div class="floating-phone">
+          <div class="phone-content">
+            <img src="../views/assets/logo.png" id="phoneLogo" alt="phone" />
+            <h3>Welcome!</h3>
+            <p>Your Health Dashboard</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
