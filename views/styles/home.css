@@ -2,31 +2,6 @@ body {
     font-family: 'Helvetica Neue', sans-serif;
     margin: 0;
 }
-.navbar {
-    background: transparent;
-}
-
-.navbar-brand {
-    letter-spacing: 3px;
-}
-.hero {
-    height: 100vh;
-    background:
-      linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
-      url('../images/hero.jpg') center/cover no-repeat;
-    padding-right: 10%;
-}
-
-.hero-title {
-    font-weight: 300;
-    letter-spacing: 1px;
-}
-
-.section-title {
-    letter-spacing: 3px;
-    font-size: 14px;
-}
-
 .product-card {
     border: 1px solid #ddd;
     background: #fff;
