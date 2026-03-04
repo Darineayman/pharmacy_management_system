@@ -1,33 +1,80 @@
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f5f3f0;
+    font-family: 'Helvetica Neue', sans-serif;
+    margin: 0;
+}
+.navbar {
+    background: transparent;
 }
 
 .navbar-brand {
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+}
+.hero {
+    height: 100vh;
+    background:
+      linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+      url('../images/hero.jpg') center/cover no-repeat;
+    padding-right: 10%;
 }
 
-.hero-section {
-    height: 90vh;
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-                url('../images/hero.jpg') center/cover no-repeat;
+.hero-title {
+    font-weight: 300;
+    letter-spacing: 1px;
 }
 
-.about-section {
-    height: 60vh;
-    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
-                url('../images/pharmacy-bg.jpg') center/cover no-repeat;
-}
-
-.card {
-    border-radius: 10px;
-}
-
-.btn-outline-dark:hover {
-    background-color: #212529;
-    color: white;
-}
-
-footer {
+.section-title {
+    letter-spacing: 3px;
     font-size: 14px;
+}
+
+.product-card {
+    border: 1px solid #ddd;
+    background: #fff;
+    transition: 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.split-section img {
+    height: 100%;
+    object-fit: cover;
+}
+
+.split-content {
+    background: #000;
+    min-height: 500px;
+}
+
+.split-content h5 {
+    letter-spacing: 2px;
+    font-weight: 300;
+}
+
+.footer {
+    background-color: #000;
+}
+
+.footer-brand {
+    letter-spacing: 4px;
+    font-weight: 300;
+}
+
+.footer-link {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin: 0 15px;
+}
+
+.footer-link:hover {
+    color: #fff;
+}
+
+.footer-copy {
+    font-size: 12px;
+    color: #666;
+    letter-spacing: 1px;
 }
