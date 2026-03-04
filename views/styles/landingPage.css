@@ -6,7 +6,6 @@ html {
   background-color: #f0f8f8;
 }
 
-/* Header */
 .header {
   position: fixed;
   top: 0;
@@ -80,17 +79,45 @@ html {
   padding: 20px;
 }
 
-/* Floating phone animation */
+
 .floating-phone {
   width: 250px;
   height: 500px;
   background-color: white;
   border-radius: 25px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* center horizontally */
+  align-items: center;     /* center vertically */
   animation: float 2s ease-in-out infinite alternate;
+  padding: 20px;           /* optional padding inside phone */
+  box-sizing: border-box;
+}
+
+.phone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+#phoneLogo {
+  max-width: 30%;       /* scale down if needed */
+  max-height: 50%;       /* make it fit inside phone height */
+  object-fit: contain;   /* maintain aspect ratio */
+  margin-bottom: 15px;
+}
+
+.floating-phone h3 {
+  font-size: 18px;
+  color: gray;
+  margin: 0;
+}
+
+.floating-phone p {
+  font-size: 14px;
+  color: gray;
+  margin-top: 5px;
 }
 
 @keyframes float {
@@ -100,38 +127,4 @@ html {
   to {
     transform: translateY(-20px);
   }
-}
-
-/* Shape Divider */
-.shape-divider {
-  height: 200px;
-  background: url("https://svgshare.com/i/uJx.svg") no-repeat center;
-  background-size: cover;
-}
-
-/* Bouncy cards placeholder */
-.bouncy-cards {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  padding: 50px 20px;
-}
-
-.bouncy-card {
-  width: 200px;
-  height: 200px;
-  margin: 20px;
-  background-color: #20c997;
-  color: white;
-  border-radius: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
-  text-align: center;
-  transition: transform 0.3s;
-}
-
-.bouncy-card:hover {
-  transform: translateY(-10px);
 }

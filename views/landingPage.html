@@ -11,7 +11,7 @@
   <body ng-controller="LandingController">
     <div class="header">
       <div class="logo">
-        <img src="../views/assets/logo.png" alt="PillStack Logo" />
+        <img src="../views/assets/logo2.png" alt="PillStack Logo" />
       </div>
       <div class="nav-buttons">
         <button class="login-btn" ng-click="navigate('login')">Login</button>
@@ -31,32 +31,13 @@
       </div>
       <div class="hero-phone">
         <div class="floating-phone">
-          <p>Phone Preview</p>
+          <div class="phone-content">
+            <img src="../views/assets/logo.png" id="phoneLogo" alt="phone" />
+            <h3>Welcome!</h3>
+            <p>Your Health Dashboard</p>
+          </div>
         </div>
       </div>
     </div>
-    <script>
-      var app = angular.module("landingApp", []);
-
-      app.controller("LandingController", [
-        "$scope",
-        "$window",
-        function ($scope, $window) {
-          $scope.features = [
-            "Easy Medicine Ordering",
-            "24/7 Online Clinic",
-            "Secure Patient Data",
-            "Fast Delivery",
-            "Health Reminders",
-          ];
-
-          $scope.navigate = function (path) {
-            // simple simulation of navigation
-            alert("Navigate to /" + path);
-            // in real AngularJS app, you'd use $location.path('/' + path);
-          };
-        },
-      ]);
-    </script>
   </body>
 </html>
