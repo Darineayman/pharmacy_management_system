@@ -1,0 +1,33 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f3f0;
+}
+
+.navbar-brand {
+    letter-spacing: 2px;
+}
+
+.hero-section {
+    height: 90vh;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+                url('../images/hero.jpg') center/cover no-repeat;
+}
+
+.about-section {
+    height: 60vh;
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+                url('../images/pharmacy-bg.jpg') center/cover no-repeat;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.btn-outline-dark:hover {
+    background-color: #212529;
+    color: white;
+}
+
+footer {
+    font-size: 14px;
+}
