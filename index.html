@@ -1,25 +1,30 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./styles/nav.css" />
-    <title>Landing Page</title>
-    <script src="app.js"></script>
+<html lang="en" ng-app="pharmly">
 
-  </head>
-  <body ng-app="productApp">
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top px-5">
-      <a class="navbar-brand mx-auto fw-light" href="#">WILLA</a>
-    </nav>
+<head>
+  <meta charset="utf-8" />
+  <title>Pharmly</title>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-route/1.8.3/angular-route.min.js"></script>
 
 
-    <div ng-view></div>
-  </body>
+  <script src="app/app.js"></script>
+  <script src="app/routes.js"></script>
+  <script src="app/auth.service.js"></script>
+
+  <script src="app/controllers/app-shell.js"></script>
+  <script src="app/directives/sidebar.js"></script>
+  <script src="app/directives/topbar.js"></script>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="app/layout/public-layout.css" />
+  <link rel="stylesheet" href="app/layout/app-layout.css" />
+</head>
+
+<body>
+  <div ng-view></div>
+</body>
+
 </html>
