@@ -1,43 +1,26 @@
-<!doctype html>
-<html ng-app="landingApp">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PillStack Landing Page</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
-    <link rel="stylesheet" href="../views/styles/landingPage.css" />
-  </head>
-
-  <body ng-controller="LandingController">
-    <div class="header">
-      <div class="logo">
-        <img src="../views/assets/logo2.png" alt="PillStack Logo" />
+<div class="public-wrap">
+  <div class="public-card">
+    <div class="public-left">
+      <div class="public-brand">
+        <div class="public-logo"></div>
+        <div>Pharmly</div>
       </div>
-      <div class="nav-buttons">
-        <button class="login-btn" ng-click="navigate('login.html')">Login</button>
-        <button class="signup-btn" ng-click="navigate('patient-register')">
-          Sign Up
-        </button>
+
+      <h1 class="public-title">Pharmacy Admin System</h1>
+      <p class="public-subtitle">
+        Manage products, suppliers, customers, and invoices with a clean dashboard experience.
+      </p>
+
+      <div style="margin-top: 22px;">
+        <a class="btn btn-primary" href="#!/login">Go to Login</a>
       </div>
     </div>
 
-    <div class="hero">
-      <div class="hero-text">
-        <h1>"Empowering Your Health Journey, One Click Away!"</h1>
-        <p>
-          Your Trusted Online Clinic & Pharmacy for Convenient Care & Medication
-          Solutions.
-        </p>
-      </div>
-      <div class="hero-phone">
-        <div class="floating-phone">
-          <div class="phone-content">
-            <img src="../views/assets/logo.png" id="phoneLogo" alt="phone" />
-            <h3>Welcome!</h3>
-            <p>Your Health Dashboard</p>
-          </div>
-        </div>
-      </div>
+    <div class="public-right">
+      <h2 class="auth-title">Quick Access</h2>
+      <p class="helper">
+        Use your admin email/password to access the dashboard.
+      </p>
     </div>
-  </body>
-</html>
+  </div>
+</div>

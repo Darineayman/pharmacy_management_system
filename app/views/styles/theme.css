@@ -1,0 +1,170 @@
+/* =========================
+   Pharmly Theme (Base)
+   ========================= */
+
+/* ---- CSS Variables ---- */
+:root {
+    /* Typography */
+    --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+    /* Backgrounds (dark) */
+    --bg: #0f1115;
+    /* main app background */
+    --surface: #141822;
+    /* cards / panels */
+    --surface-2: #101420;
+    /* deeper blocks */
+    --surface-3: rgba(255, 255, 255, 0.04);
+    /* subtle overlays */
+    --border: rgba(255, 255, 255, 0.08);
+
+    /* Text */
+    --text: rgba(255, 255, 255, 0.92);
+    --text-muted: rgba(255, 255, 255, 0.65);
+    --text-dim: rgba(255, 255, 255, 0.45);
+
+    /* Accents (Pharmly-style) */
+    --accent: #c9f56a;
+    /* lime */
+    --accent-2: #0f3d3e;
+    /* deep teal-ish */
+    --danger: #ff5c5c;
+    --warning: #ffcc66;
+    --success: #53e08a;
+
+    /* Radii */
+    --r-sm: 10px;
+    --r-md: 14px;
+    --r-lg: 18px;
+    --r-xl: 22px;
+
+    /* Shadows */
+    --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --shadow-2: 0 18px 60px rgba(0, 0, 0, 0.5);
+
+    /* Spacing */
+    --gap-1: 8px;
+    --gap-2: 12px;
+    --gap-3: 16px;
+    --gap-4: 20px;
+    --gap-5: 28px;
+
+    /* Layout sizes */
+    --sidebar-w: 260px;
+    --topbar-h: 68px;
+
+    /* Transitions */
+    --t-fast: 120ms ease;
+    --t-med: 180ms ease;
+}
+
+/* ---- Reset / Base ---- */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: var(--font-sans);
+}
+
+::selection {
+    background: rgba(201, 245, 106, 0.25);
+}
+
+/* ---- Utility ---- */
+.container {
+    width: min(1100px, calc(100% - 48px));
+    margin: 0 auto;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-1);
+}
+
+.muted {
+    color: var(--text-muted);
+}
+
+.dim {
+    color: var(--text-dim);
+}
+
+/* Buttons */
+.btn {
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: transform var(--t-fast), background var(--t-med), border-color var(--t-med);
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.btn:active {
+    transform: translateY(0px);
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #0b0e14;
+    border-color: rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.02);
+}
+
+.btn-ghost {
+    background: transparent;
+}
+
+/* Inputs */
+.input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+    outline: none;
+    transition: border-color var(--t-med), background var(--t-med);
+}
+
+.input:focus {
+    border-color: rgba(201, 245, 106, 0.35);
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+}

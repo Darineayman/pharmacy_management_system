@@ -3,13 +3,13 @@ app.config(function ($routeProvider, $locationProvider) {
     $routeProvider
         // ---------- Public ----------
         .when('/', {
-            templateUrl: 'views/public/landing.html'
+            templateUrl: 'app/views/public/landing.html'
         })
         .when('/login', {
-            templateUrl: 'views/public/login.html'
+            templateUrl: 'app/views/public/login.html'
         })
         .when('/signup', {
-            templateUrl: 'views/public/signup.html'
+            templateUrl: 'app/views/public/signup.html'
         })
 
         // ---------- Protected (all use App Shell) ----------
@@ -59,7 +59,7 @@ app.config(function ($routeProvider, $locationProvider) {
         .otherwise({ redirectTo: '/' });
 
 //     // optional: remove # from URLs if you configure server for SPA
-//     $locationProvider.html5Mode(true);
+    // $locationProvider.html5Mode(true);
 })
 
 //     // Route guard: block /app/* if not logged in
