@@ -1,0 +1,12 @@
+<div class="app-layout">
+    <app-sidebar></app-sidebar>
+
+    <div class="app-main">
+        <app-topbar title="vm.title"></app-topbar>
+
+        <div class="app-content">
+            <!-- Load inner page -->
+            <div ng-include="vm.pageTemplate"></div>
+        </div>
+    </div>
+</div>
