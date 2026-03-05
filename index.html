@@ -8,6 +8,18 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-route/1.8.3/angular-route.min.js"></script>
 
+  <body ng-controller="LandingController">
+    <div class="header">
+      <div class="logo">
+        <img src="../views/assets/logo2.png" alt="PillStack Logo" />
+      </div>
+      <div class="nav-buttons">
+        <button class="login-btn" ng-click="navigate('login.html')">Login</button>
+        <button class="signup-btn" ng-click="navigate('patient-register')">
+          Sign Up
+        </button>
+      </div>
+    </div>
 
   <script src="app/app.js"></script>
   <script src="app/routes.js"></script>
