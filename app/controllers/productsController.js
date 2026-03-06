@@ -11,6 +11,7 @@ app.controller("ProductsCtrl", function ($scope, $q) {
   vm.items = [];
   vm.filtered = [];
   vm.suppliers = [];
+  vm.categories = [];
 
   vm.lowStockThreshold = 10;
   vm.expiringDays = 30;
@@ -19,23 +20,43 @@ app.controller("ProductsCtrl", function ($scope, $q) {
 
   vm.modal = {
     mode: "add",
-    form: {},
+    form: {
+      medicine_id: null,
+      supplier_id: "",
+      name: "",
+      description: "",
+      price: null,
+      quantity: null,
+      category: "",
+      expiry_date: null,
+      image_url: "",
+    },
     saving: false,
     error: "",
   };
+
+  vm.currentPage = 1;
+  vm.pageSize = 4;
+  vm.totalPages = 1;
+  vm.pagedItems = [];
+  vm.pageSizeOptions = [4, 8, 12, 20];
 
   var modalInstance = null;
 
   vm.init = function () {
     vm.loading = true;
 
-    $q.all([vm.loadSuppliers(), vm.loadMedicines()])
+    vm.loadSuppliers()
       .then(function () {
-        vm.applyFilter();
+        return vm.loadMedicines();
+      })
+      .then(function () {
+        vm.applyFilters();
         vm.computeStats();
       })
       .finally(function () {
         vm.loading = false;
+        $scope.$applyAsync();
       });
   };
   vm.showFilters = false;
@@ -64,6 +85,7 @@ app.controller("ProductsCtrl", function ($scope, $q) {
         .order("name", { ascending: true })
         .then(function (res) {
           if (res.error) return reject(res.error);
+
           vm.suppliers = res.data || [];
           resolve(true);
           $scope.$applyAsync();
@@ -74,34 +96,87 @@ app.controller("ProductsCtrl", function ($scope, $q) {
   vm.loadMedicines = function () {
     return $q(function (resolve, reject) {
       sb.from("medicines")
-        .select("*")
+        .select(
+          "medicine_id,supplier_id,name,description,price,quantity,category,expiry_date,image_url,created_at",
+        )
+        .order("created_at", { ascending: false })
         .then(function (res) {
-          console.log("MEDICINES RES:", res); // <-- IMPORTANT
           if (res.error) return reject(res.error);
-          vm.items = res.data || [];
+
+          var meds = res.data || [];
+
+          var distinctCategories = {};
+
+          meds.forEach(function (m) {
+            if (m.category && m.category.trim() !== "") {
+              distinctCategories[m.category.trim()] = true;
+            }
+          });
+
+          vm.categories = Object.keys(distinctCategories).sort();
+
+          var supplierMap = {};
+          vm.suppliers.forEach(function (s) {
+            supplierMap[s.supplier_id] = s.name;
+          });
+
+          meds.forEach(function (m) {
+            m.supplier_name = supplierMap[m.supplier_id] || "";
+          });
+
+          vm.items = meds;
+          vm.filtered = meds.slice();
+          vm.currentPage = 1;
+          vm.updatePagedItems();
+
           resolve(true);
           $scope.$applyAsync();
         });
     });
   };
 
-  vm.applyFilter = function () {
-    var q = (vm.q || "").toLowerCase().trim();
-
-    if (!q) {
-      vm.filtered = vm.items.slice();
-      return;
-    }
-
-    vm.filtered = vm.items.filter(function (m) {
-      return (
-        (m.name || "").toLowerCase().includes(q) ||
-        (m.category || "").toLowerCase().includes(q) ||
-        (m.supplier_name || "").toLowerCase().includes(q)
-      );
-    });
+  vm.resetModalForm = function () {
+    vm.modal.form = {
+      medicine_id: null,
+      supplier_id: "",
+      name: "",
+      description: "",
+      price: null,
+      quantity: null,
+      category: "",
+      expiry_date: null,
+      image_url: "",
+    };
   };
 
+  vm.applyFilters = function () {
+    var q = (vm.q || "").toLowerCase().trim();
+
+    vm.filtered = vm.items.filter(function (m) {
+      var matchesSearch =
+        !q ||
+        (m.name || "").toLowerCase().includes(q) ||
+        (m.category || "").toLowerCase().includes(q) ||
+        (m.supplier_name || "").toLowerCase().includes(q);
+
+      var matchesCategory =
+        !vm.filters.category || m.category === vm.filters.category;
+
+      var matchesSupplier =
+        !vm.filters.supplier ||
+        String(m.supplier_id) === String(vm.filters.supplier);
+
+      var matchesLowStock =
+        !vm.filters.lowStock || (m.quantity || 0) <= vm.lowStockThreshold;
+
+      return (
+        matchesSearch && matchesCategory && matchesSupplier && matchesLowStock
+      );
+    });
+
+    vm.currentPage = 1;
+    vm.updatePagedItems();
+  };
   vm.computeStats = function () {
     vm.stats.total = vm.items.length;
 
@@ -129,35 +204,31 @@ app.controller("ProductsCtrl", function ($scope, $q) {
   vm.openAddModal = function () {
     vm.modal.mode = "add";
     vm.modal.error = "";
-    vm.modal.form = {
-      supplier_id: "",
-      name: "",
-      description: "",
-      price: 0,
-      quantity: 0,
-      category: "",
-      expiry_date: null,
-      image_url: "",
-    };
+    vm.modal.saving = false;
+    vm.resetModalForm();
     vm.showModal();
   };
 
   vm.openEditModal = function (m) {
     vm.modal.mode = "edit";
     vm.modal.error = "";
+    vm.modal.saving = false;
+
     vm.modal.form = {
       medicine_id: m.medicine_id,
       supplier_id: m.supplier_id,
-      name: m.name,
-      description: m.description,
+      name: m.name || "",
+      description: m.description || "",
       price: m.price,
       quantity: m.quantity,
-      category: m.category,
-      expiry_date: m.expiry_date,
-      image_url: m.image_url,
+      category: m.category || "",
+      expiry_date: m.expiry_date ? new Date(m.expiry_date) : null,
+      image_url: m.image_url || "",
     };
+
     vm.showModal();
   };
+  var modalInstance = null;
 
   vm.showModal = function () {
     var el = document.getElementById("medicineModal");
@@ -166,56 +237,64 @@ app.controller("ProductsCtrl", function ($scope, $q) {
   };
 
   vm.hideModal = function () {
-    if (modalInstance) modalInstance.hide();
+    if (modalInstance) {
+      modalInstance.hide();
+    }
   };
-
   vm.saveMedicine = function () {
     vm.modal.error = "";
     vm.modal.saving = true;
 
+    if (!vm.modal.form.name || !vm.modal.form.supplier_id) {
+      vm.modal.error = "Please fill in the required fields.";
+      vm.modal.saving = false;
+      return;
+    }
+
     var payload = {
-      supplier_id: vm.modal.form.supplier_id,
+      supplier_id: Number(vm.modal.form.supplier_id),
       name: vm.modal.form.name,
       description: vm.modal.form.description || null,
-      price: Number(vm.modal.form.price),
-      quantity: Number(vm.modal.form.quantity),
+      price: Number(vm.modal.form.price || 0),
+      quantity: Number(vm.modal.form.quantity || 0),
       category: vm.modal.form.category || null,
       expiry_date: vm.modal.form.expiry_date || null,
       image_url: vm.modal.form.image_url || null,
     };
 
-    console.log("Saving medicine...", payload);
+    var request;
 
-    var req;
     if (vm.modal.mode === "add") {
-      req = sb.from("medicines").insert([payload]);
+      request = sb.from("medicines").insert([payload]);
     } else {
-      req = sb
+      request = sb
         .from("medicines")
         .update(payload)
         .eq("medicine_id", vm.modal.form.medicine_id);
     }
 
-    req
+    request
       .then(function (res) {
         if (res.error) throw res.error;
-        return vm.loadSuppliers().then(vm.loadMedicines);
+
+        return vm.loadSuppliers().then(function () {
+          return vm.loadMedicines();
+        });
       })
       .then(function () {
-        vm.applyFilter();
+        vm.applyFilters();
         vm.computeStats();
         vm.hideModal();
       })
       .catch(function (err) {
-        console.error("Save error:", err);
-        vm.modal.error = err.message || "Failed to save medicine";
+        console.error("Save medicine error:", err);
+        vm.modal.error = err.message || "Failed to save medicine.";
       })
       .finally(function () {
         vm.modal.saving = false;
         $scope.$applyAsync();
       });
   };
-
   vm.confirmDelete = function (m) {
     if (!confirm("Delete " + m.name + "?")) return;
 
@@ -238,5 +317,46 @@ app.controller("ProductsCtrl", function ($scope, $q) {
       });
   };
 
+  vm.updatePagedItems = function () {
+    var start = (vm.currentPage - 1) * vm.pageSize;
+    var end = start + vm.pageSize;
+
+    vm.totalPages = Math.max(1, Math.ceil(vm.filtered.length / vm.pageSize));
+    vm.pagedItems = vm.filtered.slice(start, end);
+  };
+
+  vm.goToPage = function (page) {
+    if (page < 1 || page > vm.totalPages) return;
+    vm.currentPage = page;
+    vm.updatePagedItems();
+  };
+
+  vm.changePageSize = function () {
+    vm.currentPage = 1;
+    vm.updatePagedItems();
+  };
+
+  vm.getVisiblePages = function () {
+    var pages = [];
+    var total = vm.totalPages;
+    var current = vm.currentPage;
+
+    if (total <= 5) {
+      for (var i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+      return pages;
+    }
+
+    if (current <= 3) {
+      return [1, 2, 3, "...", total];
+    }
+
+    if (current >= total - 2) {
+      return [1, "...", total - 2, total - 1, total];
+    }
+
+    return [1, "...", current, "...", total];
+  };
   vm.init();
 });

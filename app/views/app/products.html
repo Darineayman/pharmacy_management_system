@@ -35,7 +35,7 @@
           type="text"
           placeholder="Search..."
           ng-model="vm.q"
-          ng-change="vm.applyFilter()"
+          ng-change="vm.applyFilters()"
         />
       </div>
 
@@ -45,7 +45,7 @@
           type="button"
           ng-click="vm.openAddModal()"
         >
-          <span class="add-icon">＋</span>
+          <span class="add-icon">+</span>
           <span>Add New Medicine</span>
         </button>
 
@@ -141,7 +141,7 @@
             <td colspan="8" class="empty-state">No medicines found.</td>
           </tr>
 
-          <tr ng-repeat="m in vm.filtered track by m.medicine_id">
+          <tr ng-repeat="m in vm.pagedItems track by m.medicine_id">
             <td>
               <div class="thumb">
                 <img
@@ -203,7 +203,10 @@
         </tbody>
       </table>
     </div>
+<<<<<<< HEAD
     
+=======
+>>>>>>> main
     <div class="table-pagination">
       <div class="pagination-info">
         <span>Showing</span>
@@ -242,7 +245,11 @@
           ng-click="vm.goToPage(vm.currentPage + 1)"
           ng-disabled="vm.currentPage === vm.totalPages"
         >
+<<<<<<< HEAD
           >
+=======
+          ›
+>>>>>>> main
         </button>
       </div>
     </div>
@@ -323,11 +330,13 @@
 
               <div class="col-md-3">
                 <label class="label">Category</label>
-                <input
+                <select
                   class="input"
-                  type="text"
                   ng-model="vm.modal.form.category"
-                />
+                  ng-options="c for c in vm.categories"
+                >
+                  <option value="">Select category…</option>
+                </select>
               </div>
 
               <div class="col-md-3">
@@ -356,7 +365,12 @@
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              data-bs-dismiss="modal"
+              ng-click="vm.modal.error = ''"
+            >
               Cancel
             </button>
             <button
@@ -364,7 +378,9 @@
               class="btn btn-primary"
               ng-disabled="vm.modal.saving"
             >
-              {{ vm.modal.saving ? 'Saving…' : 'Save' }}
+              {{ vm.modal.saving ? (vm.modal.mode === 'add' ? 'Adding...' :
+              'Updating...') : (vm.modal.mode === 'add' ? 'Add Medicine' :
+              'Update Medicine') }}
             </button>
           </div>
         </form>
