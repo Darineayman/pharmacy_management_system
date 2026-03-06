@@ -1,0 +1,87 @@
+:root{
+  --sky-1:#1e473f;
+  --sky-2:#002a27;
+  --cta:#4B5565;
+  --ink:#1e473f;
+  --muted:#f6f6f4;
+}
+*{box-sizing:border-box;}
+body{margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;}
+
+.auth-page{
+  height: 100vh;          
+  overflow: hidden;       
+  display:flex;
+  align-items:center;
+  padding: 0;             
+  background:
+    radial-gradient(1200px 500px at 50% 35%, rgba(255,255,255,0.65), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, var(--sky-1), var(--sky-2));
+}
+
+.auth-card{
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.75);
+  max-height: calc(100vh - 24px);
+  backdrop-filter: blur(10px);
+}
+
+.auth-header{
+  padding: 22px 26px 12px;
+}
+
+.brand-mark{
+  width:34px; height:34px; border-radius:10px;
+  background: linear-gradient(135deg, var(--cta), #1e473f);
+  display:inline-block;
+}
+.brand-name{ font-weight: 800; color: var(--ink); }
+
+.auth-title{
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.auth-sub{
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.auth-body{
+  padding: 16px 26px 22px;
+}
+
+.pill{
+  border-radius: 999px !important;
+  height: 48px;
+  border: 1px solid rgba(15,23,42,0.08);
+}
+
+.input-icon{
+  position: relative;
+}
+.input-icon i{
+  position:absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(15,23,42,0.55);
+  font-size: 1.05rem;
+  pointer-events:none;
+}
+.input-icon input,
+.input-icon select{
+  padding-left: 44px;
+}
+
+.auth-footer{
+  background: #0b0f18;
+  padding: 14px 18px;
+}
+@media (max-height: 700px){
+  .auth-title{ font-size: 1.5rem; }
+  .auth-sub{ font-size: 0.9rem; }
+  .auth-footer{ padding: 10px 16px; }
+}

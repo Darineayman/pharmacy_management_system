@@ -1,4 +1,4 @@
-<div class="public-wrap">
+<div class="public-wrap" ng-controller="LoginController as vm">
     <div class="public-card">
         <div class="public-left">
             <div class="public-brand">
@@ -22,12 +22,10 @@
                 <label class="label">Password</label>
                 <input class="input" type="password" placeholder="••••••••" ng-model="vm.password">
             </div>
-
             <div class="auth-actions">
                 <button class="btn btn-primary" type="button" ng-click="vm.login()">Login</button>
                 <a class="btn btn-ghost" href="#!/">Back</a>
             </div>
-
             <div class="helper" ng-if="vm.error">{{ vm.error }}</div>
         </div>
     </div>
