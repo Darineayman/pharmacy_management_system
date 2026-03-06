@@ -203,6 +203,49 @@
         </tbody>
       </table>
     </div>
+    
+    <div class="table-pagination">
+      <div class="pagination-info">
+        <span>Showing</span>
+
+        <select
+          class="page-size-select"
+          ng-model="vm.pageSize"
+          ng-options="size for size in vm.pageSizeOptions"
+          ng-change="vm.changePageSize()"
+        ></select>
+
+        <span>out of {{ vm.filtered.length }}</span>
+      </div>
+
+      <div class="pagination-controls" ng-if="vm.totalPages > 1">
+        <button
+          class="page-btn nav-btn"
+          ng-click="vm.goToPage(vm.currentPage - 1)"
+          ng-disabled="vm.currentPage === 1"
+        >
+          ‹
+        </button>
+
+        <button
+          class="page-btn"
+          ng-repeat="page in vm.getVisiblePages() track by $index"
+          ng-class="{ active: vm.currentPage === page, ellipsis: page === '...' }"
+          ng-click="page !== '...' && vm.goToPage(page)"
+          ng-disabled="page === '...'"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          class="page-btn nav-btn"
+          ng-click="vm.goToPage(vm.currentPage + 1)"
+          ng-disabled="vm.currentPage === vm.totalPages"
+        >
+          >
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Add/Edit Modal -->

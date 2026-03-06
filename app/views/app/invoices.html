@@ -1,0 +1,519 @@
+<div class="app-content" ng-controller="InvoicesCtrl as vm">
+  <div class="page-head">
+    <div class="stats-row">
+      <div class="kpi-card kpi-accent">
+        <div class="kpi-label">Total Invoices</div>
+        <div class="kpi-value">{{ vm.stats.total }}</div>
+        <div class="kpi-sub">All recorded invoices</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Paid</div>
+        <div class="kpi-value">{{ vm.stats.paid }}</div>
+        <div class="kpi-sub">Completed payments</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Drafts</div>
+        <div class="kpi-value">{{ vm.stats.draft }}</div>
+        <div class="kpi-sub">Awaiting payment</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Revenue</div>
+        <div class="kpi-value">{{ vm.stats.revenue | currency:"$":2 }}</div>
+        <div class="kpi-sub">From all invoices</div>
+      </div>
+    </div>
+
+    <div class="toolbar toolbar-order-style">
+      <div class="searchbox searchbox-order-style">
+        <span class="search-ico">⌕</span>
+        <input
+          class="search-input"
+          type="text"
+          placeholder="Search invoices..."
+          ng-model="vm.q"
+          ng-change="vm.applyFilters()"
+        />
+      </div>
+
+      <div class="toolbar-actions toolbar-actions-order-style">
+        <button
+          class="add-medicine-btn"
+          type="button"
+          ng-click="vm.openCreateInvoice()"
+        >
+          <span class="add-icon">+</span>
+          <span>Add New Invoice</span>
+        </button>
+
+        <button
+          class="filter-btn-order"
+          type="button"
+          ng-click="vm.toggleFilters()"
+        >
+          <span class="filter-icon">⌯</span>
+          <span>Filters</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="filters-popover" ng-show="vm.showFilters">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Status</label>
+          <select
+            class="filter-input"
+            ng-model="vm.filters.status"
+            ng-change="vm.applyFilters()"
+          >
+            <option value="">All Statuses</option>
+            <option value="paid">Paid</option>
+            <option value="draft">Draft</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Payment Method</label>
+          <select
+            class="filter-input"
+            ng-model="vm.filters.payment_method"
+            ng-change="vm.applyFilters()"
+          >
+            <option value="">All Methods</option>
+            <option value="cash">Cash</option>
+            <option value="card">Card</option>
+            <option value="wallet">Wallet</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filters-actions">
+        <button
+          class="reset-filter-btn"
+          type="button"
+          ng-click="vm.clearFilters()"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-head">
+      <div class="table-title">Invoices</div>
+      <div class="muted" ng-if="vm.loading">Loading…</div>
+      <div class="muted" ng-if="!vm.loading">
+        Showing {{ vm.pagedItems.length }} items
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table table-darkx">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Customer</th>
+            <th>Created By</th>
+            <th>Payment Method</th>
+            <th>Status</th>
+            <th>Total Amount</th>
+            <th>Created At</th>
+            <th style="width: 120px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-if="!vm.loading && vm.pagedItems.length === 0">
+            <td colspan="8" class="empty-state">No invoices found.</td>
+          </tr>
+
+          <tr ng-repeat="inv in vm.pagedItems track by inv.invoice_id">
+            <td class="muted">
+              {{ inv.invoice_number || ('INV-' + inv.invoice_id) }}
+            </td>
+            <td>{{ inv.customer_name || 'Walk-in Customer' }}</td>
+            <td class="muted">{{ inv.created_by_name || '—' }}</td>
+            <td class="muted">{{ inv.payment_method || '—' }}</td>
+
+            <td>
+              <span
+                class="pill"
+                ng-class="{
+                  'pill-ok': inv.status === 'paid',
+                  'pill-warn': inv.status === 'draft',
+                  'pill-bad': inv.status === 'cancelled'
+                }"
+              >
+                {{ inv.status || '—' }}
+              </span>
+            </td>
+
+            <td class="muted">{{ inv.total_amount | currency:"$":2 }}</td>
+            <td class="muted">{{ inv.created_at | date:'yyyy-MM-dd' }}</td>
+
+            <td>
+              <div class="row-actions">
+                <button
+                  class="icon-btn"
+                  title="View"
+                  type="button"
+                  ng-click="vm.openViewInvoiceModal(inv)"
+                >
+                  👁
+                </button>
+                <button
+                  class="icon-btn danger"
+                  title="Delete"
+                  ng-click="vm.confirmDelete(inv)"
+                >
+                  🗑
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-pagination">
+      <div class="pagination-info">
+        <span>Showing</span>
+
+        <select
+          class="page-size-select"
+          ng-model="vm.pageSize"
+          ng-options="size for size in vm.pageSizeOptions"
+          ng-change="vm.changePageSize()"
+        ></select>
+
+        <span>out of {{ vm.filtered.length }}</span>
+      </div>
+
+      <div class="pagination-controls" ng-if="vm.totalPages > 1">
+        <button
+          class="page-btn nav-btn"
+          ng-click="vm.goToPage(vm.currentPage - 1)"
+          ng-disabled="vm.currentPage === 1"
+        >
+          ‹
+        </button>
+
+        <button
+          class="page-btn"
+          ng-repeat="page in vm.getVisiblePages() track by $index"
+          ng-class="{ active: vm.currentPage === page, ellipsis: page === '...' }"
+          ng-click="page !== '...' && vm.goToPage(page)"
+          ng-disabled="page === '...'"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          class="page-btn nav-btn"
+          ng-click="vm.goToPage(vm.currentPage + 1)"
+          ng-disabled="vm.currentPage === vm.totalPages"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW INVOICE DETAILS MODAL -->
+  <div
+    class="modal fade"
+    id="invoiceDetailsModal"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content modal-dark">
+        <div class="modal-header">
+          <h5 class="modal-title">Invoice Details</h5>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <div ng-if="vm.invoiceView.loading" class="muted">
+            Loading invoice details...
+          </div>
+
+          <div ng-if="vm.invoiceView.error" class="helper">
+            {{ vm.invoiceView.error }}
+          </div>
+
+          <div ng-if="!vm.invoiceView.loading && vm.invoiceView.invoice">
+            <div class="invoice-meta-grid">
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Invoice Number</div>
+                <div class="invoice-meta-value">
+                  {{ vm.invoiceView.invoice.invoice_number || ('INV-' +
+                  vm.invoiceView.invoice.invoice_id) }}
+                </div>
+              </div>
+
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Customer</div>
+                <div class="invoice-meta-value">
+                  {{ vm.invoiceView.invoice.customer_name || 'Walk-in Customer'
+                  }}
+                </div>
+              </div>
+
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Created By</div>
+                <div class="invoice-meta-value">
+                  {{ vm.invoiceView.invoice.created_by_name || '—' }}
+                </div>
+              </div>
+
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Payment Method</div>
+                <div class="invoice-meta-value">
+                  {{ vm.invoiceView.invoice.payment_method || '—' }}
+                </div>
+              </div>
+
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Status</div>
+                <div class="invoice-meta-value">
+                  {{ vm.invoiceView.invoice.status || '—' }}
+                </div>
+              </div>
+
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Total Amount</div>
+                <div class="invoice-meta-value">
+                  {{ vm.invoiceView.invoice.total_amount | currency:"$":2 }}
+                </div>
+              </div>
+            </div>
+
+            <div class="invoice-items-wrap">
+              <table class="table table-darkx">
+                <thead>
+                  <tr>
+                    <th>Medicine</th>
+                    <th style="width: 110px">Qty</th>
+                    <th style="width: 140px">Unit Price</th>
+                    <th style="width: 150px">Line Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-if="vm.invoiceView.items.length === 0">
+                    <td colspan="4" class="empty-state">
+                      No invoice items found.
+                    </td>
+                  </tr>
+
+                  <tr
+                    ng-repeat="item in vm.invoiceView.items track by item.invoiceItem_id"
+                  >
+                    <td>{{ item.medicine_name }}</td>
+                    <td class="muted">{{ item.quantity }}</td>
+                    <td class="muted">
+                      {{ item.unit_price | currency:"$":2 }}
+                    </td>
+                    <td class="muted">
+                      <div>{{ item.line_total | currency:"$":2 }}</div>
+                      <div
+                        class="line-total-breakdown"
+                        ng-if="item.quantity > 1"
+                      >
+                        {{ item.quantity }} × {{ item.unit_price |
+                        currency:"$":2 }}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn"
+            style="background-color: #0c4f4a; color: #fff"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD NEW INVOICE MODAL -->
+  <div class="modal fade" id="addInvoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content modal-dark">
+        <div class="modal-header">
+          <h5 class="modal-title">Add New Invoice</h5>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <form ng-submit="vm.saveInvoice()" novalidate>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="label">Customer</label>
+
+                <select
+                  class="input"
+                  ng-model="vm.invoiceModal.form.customer_id"
+                  ng-options="c.customer_id as c.full_name for c in vm.customers"
+                >
+                  <option value="">Walk-in Customer</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="label">Payment Method</label>
+                <select
+                  class="input"
+                  ng-model="vm.invoiceModal.form.payment_method"
+                >
+                  <option value="cash">Cash</option>
+                  <option value="card">Card</option>
+                  <option value="wallet">Wallet</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="label">Status</label>
+                <select class="input" ng-model="vm.invoiceModal.form.status">
+                  <option value="paid">Paid</option>
+                  <option value="draft">Draft</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="invoice-builder mt-4">
+              <div
+                class="d-flex justify-content-between align-items-center mb-4"
+              >
+                <h6 class="mb-0">Invoice Items</h6>
+
+                <button
+                  type="button"
+                  class="btn btn-ghost add-item-btn"
+                  ng-click="vm.addInvoiceItemRow()"
+                >
+                  <span class="add-item-icon">+</span>
+                  <span >Add Item</span>
+                </button>
+              </div>
+
+              <div
+                class="invoice-item-row row g-3 mb-3"
+                ng-repeat="item in vm.invoiceModal.form.items track by $index"
+              >
+                <div class="col-md-5">
+                  <label class="label">Medicine</label>
+                  <select
+                    class="input"
+                    ng-model="item.medicine_id"
+                    ng-options="m.medicine_id as m.name for m in vm.medicines"
+                    ng-change="vm.onMedicineChange(item)"
+                  >
+                    <option value="">Select medicine…</option>
+                  </select>
+                </div>
+
+                <div class="col-md-2">
+                  <label class="label">Qty</label>
+                  <input
+                    class="input"
+                    type="number"
+                    min="1"
+                    ng-model="item.quantity"
+                    ng-change="vm.updateLineTotal(item)"
+                  />
+                </div>
+
+                <div class="col-md-2">
+                  <label class="label">Unit Price</label>
+                  <input
+                    class="input"
+                    type="number"
+                    ng-model="item.unit_price"
+                    readonly
+                  />
+                </div>
+
+                <div class="col-md-2">
+                  <label class="label">Line Total</label>
+                  <input
+                    class="input"
+                    type="number"
+                    ng-model="item.line_total"
+                    readonly
+                  />
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+                  <button
+                    type="button"
+                    class="icon-btn danger"
+                    ng-click="vm.removeInvoiceItemRow($index)"
+                  >
+                    🗑
+                  </button>
+                </div>
+              </div>
+
+              <div
+                class="empty-invoice-items"
+                ng-if="vm.invoiceModal.form.items.length === 0"
+              >
+                No items yet. Click <strong>Add Item</strong> to start building
+                the invoice.
+              </div>
+            </div>
+
+            <div class="invoice-total-box mt-3">
+              <div class="invoice-total-label">Invoice Total</div>
+              <div class="invoice-total-value">
+                {{ vm.invoiceModal.form.total_amount | currency:"$":2 }}
+              </div>
+            </div>
+
+            <div class="helper mt-3" ng-if="vm.invoiceModal.error">
+              {{ vm.invoiceModal.error }}
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              ng-disabled="vm.invoiceModal.saving"
+            >
+              {{ vm.invoiceModal.saving ? 'Saving...' : 'Save Invoice' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
