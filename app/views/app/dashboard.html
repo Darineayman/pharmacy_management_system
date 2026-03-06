@@ -1,15 +1,159 @@
-<!DOCTYPE html>
-<html lang="en">
+<div ng-controller="DashboardCtrl as dash">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>dashboard
-  </title>
-</head>
+  <div ng-if="dash.loading" class="dashboard-loading">
+    Loading dashboard...
+  </div>
 
-<body>
+  <div ng-if="dash.error" class="dashboard-error">
+    {{ dash.error }}
+  </div>
 
-</body>
+  <div ng-if="!dash.loading && !dash.error">
 
-</html>
+    <!-- Top stats -->
+    <div class="dashboard-top-row">
+      <div class="dashboard-stats">
+        <div class="stat-card" ng-repeat="stat in dash.stats track by $index" ng-class="stat.cardClass">
+          <!-- background ghost icon -->
+          <div class="stat-bg-icon">
+            <i class="{{ stat.bgIcon }}"></i>
+          </div>
+
+          <div class="stat-card-top">
+            <div class="stat-icon">
+              <i class="{{ stat.icon }}"></i>
+            </div>
+
+            <div class="stat-trend">{{ stat.trend }}</div>
+          </div>
+
+          <div class="stat-card-body">
+            <div class="stat-title">{{ stat.title }}</div>
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-subtitle">{{ stat.subtitle }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="promo-card">
+        <div class="promo-overlay">
+          <h3>Discover How to Maximize Your Pharmacy’s Efficiency</h3>
+          <button class="promo-btn">
+            Learn more <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics + Top Medicines -->
+    <div class="dashboard-main-row">
+      <div class="analytics-card">
+        <div class="section-head">
+          <h2>Sales Analytics</h2>
+
+          <div class="section-actions">
+            <button class="mini-pill">This Year <i class="fa-solid fa-chevron-down"></i></button>
+            <button class="circle-btn"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="circle-btn"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+        </div>
+
+        <div class="sales-chart">
+          <div class="y-axis">
+            <span>Max</span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span>Min</span>
+          </div>
+
+          <div class="bars-area">
+            <div class="bars-grid">
+              <div class="bar-group" ng-repeat="bar in dash.salesBars track by $index">
+                <div class="bar" ng-class="{'active-bar': $index === 6}" ng-style="{ height: dash.getBarHeight(bar) }">
+                </div>
+                <span>{{ ('0' + ($index + 1)).slice(-2) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="top-medicines-card">
+        <div class="section-head">
+          <h2>Top Selling Medicines</h2>
+          <button class="mini-pill">All Time <i class="fa-solid fa-chevron-down"></i></button>
+        </div>
+
+        <div class="top-meds-chart" ng-if="dash.topMedicines.length > 0">
+          <div class="top-med-item" ng-repeat="med in dash.topMedicines track by $index">
+            <div class="top-med-bar-wrap">
+              <div class="top-med-bar {{ med.barClass }}" ng-style="{ height: med.height + 'px' }">
+                <span>{{ med.shortName }}</span>
+              </div>
+            </div>
+            <div class="top-med-price">{{ med.amount }}</div>
+          </div>
+        </div>
+
+        <div class="empty-state" ng-if="dash.topMedicines.length === 0">
+          No medicine sales data yet.
+        </div>
+      </div>
+    </div>
+
+    <!-- Latest orders -->
+    <div class="latest-orders-card">
+      <div class="section-head">
+        <h2>Latest Invoices</h2>
+        <a href="#!/app/invoices" class="view-all-link">View All</a>
+      </div>
+
+      <div class="orders-table-wrap" ng-if="dash.latestOrders.length > 0">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Invoice ID</th>
+              <th>Customer</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="order in dash.latestOrders track by $index">
+              <td>{{ order.id }}</td>
+              <td>{{ order.customer }}</td>
+              <td>{{ order.price }}</td>
+              <td>
+                <span class="status-pill" ng-class="{
+                    'status-delivered': order.status === 'paid',
+                    'status-pending': order.status === 'draft',
+                    'status-cancelled': order.status === 'cancelled'
+                  }">
+                  {{ order.status }}
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="table-actions">
+                  <a ng-href="#!/app/invoices/{{ order.invoiceId }}" class="action-btn" title="View">
+                    <i class="fa-regular fa-eye"></i>
+                  </a>
+                  <button class="action-btn danger" type="button" title="Delete"
+                    ng-click="dash.deleteInvoice(order.invoiceId)">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" ng-if="dash.latestOrders.length === 0">
+        No invoices found yet.
+      </div>
+    </div>
+
+  </div>
+</div>
