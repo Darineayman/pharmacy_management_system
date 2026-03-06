@@ -1,0 +1,249 @@
+<div ng-controller="CustomersCtrl as cust">
+
+    <div ng-if="cust.loading" class="dashboard-loading">
+        Loading customers...
+    </div>
+
+    <div ng-if="cust.error" class="dashboard-error">
+        {{ cust.error }}
+    </div>
+
+    <div ng-if="!cust.loading">
+
+        <!-- Stat cards -->
+        <div class="customers-stats-row">
+            <div class="customer-stat-card customer-stat-card-dark">
+                <div class="customer-stat-top">
+                    <div class="customer-stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                </div>
+                <div class="customer-stat-title">Total Customers</div>
+                <div class="customer-stat-value">{{ cust.stats.totalCustomers }}</div>
+                <div class="customer-stat-meta">All registered customers</div>
+            </div>
+
+            <div class="customer-stat-card">
+                <div class="customer-stat-top">
+                    <div class="customer-stat-icon"><i class="fa-solid fa-crown"></i></div>
+                    <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                </div>
+                <div class="customer-stat-title">Loyal Customers</div>
+                <div class="customer-stat-value">{{ cust.stats.loyalCustomers }}</div>
+                <div class="customer-stat-meta">Loyalty points above 100</div>
+            </div>
+
+            <div class="customer-stat-card">
+                <div class="customer-stat-top">
+                    <div class="customer-stat-icon"><i class="fa-solid fa-user-plus"></i></div>
+                    <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                </div>
+                <div class="customer-stat-title">New Customers</div>
+                <div class="customer-stat-value">{{ cust.stats.newCustomers }}</div>
+                <div class="customer-stat-meta">Joined in the last 30 days</div>
+            </div>
+        </div>
+
+        <!-- Main card -->
+        <div class="customers-main-card">
+
+            <!-- Top actions -->
+            <div class="customers-toolbar">
+                <div class="customers-search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="customers-search-input" placeholder="Search..." ng-model="cust.searchText"
+                        ng-change="cust.applyFilters()">
+                </div>
+
+                <div class="customers-toolbar-actions">
+                    <button class="add-customer-btn" ng-click="cust.openAddModal()">
+                        <i class="fa-solid fa-circle-plus"></i>
+                        Add New Customer
+                    </button>
+
+                    <button class="filter-btn" ng-click="cust.toggleFilters()">
+                        <i class="fa-solid fa-sliders"></i>
+                        Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters panel -->
+            <div class="customers-filters-panel" ng-if="cust.showFilters">
+                <div class="customers-filters-grid">
+                    <div>
+                        <label class="customers-filter-label">Loyalty Type</label>
+                        <select class="customers-filter-select" ng-model="cust.filters.loyaltyType"
+                            ng-change="cust.applyFilters()">
+                            <option value="">All Customers</option>
+                            <option value="loyal">Loyal Customers</option>
+                            <option value="regular">Regular Customers</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="customers-filter-label">Orders</label>
+                        <select class="customers-filter-select" ng-model="cust.filters.hasOrders"
+                            ng-change="cust.applyFilters()">
+                            <option value="">All</option>
+                            <option value="yes">Has Orders</option>
+                            <option value="no">No Orders</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="customers-filter-label">Minimum Spend</label>
+                        <input type="number" class="customers-filter-input" placeholder="e.g. 100"
+                            ng-model="cust.filters.minSpend" ng-change="cust.applyFilters()">
+                    </div>
+                </div>
+
+                <div class="customers-filters-reset-wrap">
+                    <button class="filter-btn" ng-click="cust.resetFilters()">Reset</button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="customers-table-wrap">
+                <table class="customers-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Orders Placed</th>
+                            <th>Total Spend</th>
+                            <th>Last Order</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="customer in cust.pagedCustomers track by customer.customer_id">
+                            <td>#CUS{{ customer.customer_id }}</td>
+                            <td>{{ customer.full_name }}</td>
+                            <td class="customers-email">{{ customer.email || '-' }}</td>
+                            <td>{{ customer.phone_number || '-' }}</td>
+                            <td>{{ customer.orders_placed }}</td>
+                            <td>{{ cust.formatCurrency(customer.total_spend) }}</td>
+                            <td>{{ cust.formatDate(customer.last_order) }}</td>
+                            <td class="text-center">
+                                <div class="table-actions">
+                                    <button class="action-btn" type="button" ng-click="cust.openEditModal(customer)">
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </button>
+                                    <button class="action-btn danger" type="button"
+                                        ng-click="cust.deleteCustomer(customer.customer_id)">
+                                        <i class="fa-regular fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr ng-if="cust.pagedCustomers.length === 0">
+                            <td colspan="8" class="customers-empty">No customers found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="customers-pagination-wrap">
+                <div class="customers-pagination-info">
+                    Showing
+                    <span class="customers-page-size">{{ cust.pagination.pageSize }}</span>
+                    out of {{ cust.filteredCustomers.length }}
+                </div>
+
+                <div class="customers-pagination">
+                    <button ng-repeat="page in cust.getPageNumbers() track by page" class="customers-page-btn"
+                        ng-class="{active: cust.pagination.currentPage === page}" ng-click="cust.changePage(page)">
+                        {{ page }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Customer Modal -->
+        <div class="customers-modal-backdrop" ng-if="cust.showAddModal">
+            <div class="customers-modal">
+                <div class="customers-modal-head">
+                    <h3>Add New Customer</h3>
+                    <button class="customers-modal-close" ng-click="cust.closeAddModal()">&times;</button>
+                </div>
+
+                <div class="customers-modal-body">
+                    <div class="customers-form-grid">
+                        <div>
+                            <label class="customers-filter-label">Full Name</label>
+                            <input class="customers-filter-input" ng-model="cust.newCustomer.full_name">
+                        </div>
+                        <div>
+                            <label class="customers-filter-label">Phone</label>
+                            <input class="customers-filter-input" ng-model="cust.newCustomer.phone_number">
+                        </div>
+                        <div>
+                            <label class="customers-filter-label">Email</label>
+                            <input class="customers-filter-input" ng-model="cust.newCustomer.email">
+                        </div>
+                        <div>
+                            <label class="customers-filter-label">Loyalty Points</label>
+                            <input type="number" class="customers-filter-input"
+                                ng-model="cust.newCustomer.loyalty_points">
+                        </div>
+                        <div class="customers-form-col-full">
+                            <label class="customers-filter-label">Address</label>
+                            <input class="customers-filter-input" ng-model="cust.newCustomer.address">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="customers-modal-footer">
+                    <button class="filter-btn" ng-click="cust.closeAddModal()">Cancel</button>
+                    <button class="add-customer-btn" ng-click="cust.addCustomer()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Customer Modal -->
+        <div class="customers-modal-backdrop" ng-if="cust.showEditModal">
+            <div class="customers-modal">
+                <div class="customers-modal-head">
+                    <h3>Edit Customer</h3>
+                    <button class="customers-modal-close" ng-click="cust.closeEditModal()">&times;</button>
+                </div>
+
+                <div class="customers-modal-body" ng-if="cust.editCustomerData">
+                    <div class="customers-form-grid">
+                        <div>
+                            <label class="customers-filter-label">Full Name</label>
+                            <input class="customers-filter-input" ng-model="cust.editCustomerData.full_name">
+                        </div>
+                        <div>
+                            <label class="customers-filter-label">Phone</label>
+                            <input class="customers-filter-input" ng-model="cust.editCustomerData.phone_number">
+                        </div>
+                        <div>
+                            <label class="customers-filter-label">Email</label>
+                            <input class="customers-filter-input" ng-model="cust.editCustomerData.email">
+                        </div>
+                        <div>
+                            <label class="customers-filter-label">Loyalty Points</label>
+                            <input type="number" class="customers-filter-input"
+                                ng-model="cust.editCustomerData.loyalty_points">
+                        </div>
+                        <div class="customers-form-col-full">
+                            <label class="customers-filter-label">Address</label>
+                            <input class="customers-filter-input" ng-model="cust.editCustomerData.address">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="customers-modal-footer">
+                    <button class="filter-btn" ng-click="cust.closeEditModal()">Cancel</button>
+                    <button class="add-customer-btn" ng-click="cust.updateCustomer()">Update</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
