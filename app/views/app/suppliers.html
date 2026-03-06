@@ -1,0 +1,249 @@
+<div ng-controller="SuppliersCtrl as sup">
+
+    <div ng-if="sup.loading" class="dashboard-loading">
+        Loading suppliers...
+    </div>
+
+    <div ng-if="sup.error" class="dashboard-error">
+        {{ sup.error }}
+    </div>
+
+    <div ng-if="!sup.loading">
+
+        <!-- Stat cards -->
+        <div class="suppliers-stats-row">
+            <div class="supplier-stat-card supplier-stat-card-dark">
+                <div class="supplier-stat-top">
+                    <div class="supplier-stat-icon"><i class="fa-solid fa-building"></i></div>
+                    <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                </div>
+                <div class="supplier-stat-title">Total Suppliers</div>
+                <div class="supplier-stat-value">{{ sup.stats.totalSuppliers }}</div>
+                <div class="supplier-stat-meta">Registered suppliers</div>
+            </div>
+
+            <div class="supplier-stat-card">
+                <div class="supplier-stat-top">
+                    <div class="supplier-stat-icon"><i class="fa-solid fa-handshake"></i></div>
+                    <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                </div>
+                <div class="supplier-stat-title">Active Suppliers</div>
+                <div class="supplier-stat-value">{{ sup.stats.activeSuppliers }}</div>
+                <div class="supplier-stat-meta">Purchased from in last 30 days</div>
+            </div>
+
+            <div class="supplier-stat-card">
+                <div class="supplier-stat-top">
+                    <div class="supplier-stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                </div>
+                <div class="supplier-stat-title">Total Purchase Value</div>
+                <div class="supplier-stat-value">{{ sup.formatCurrency(sup.stats.totalPurchaseValue) }}</div>
+                <div class="supplier-stat-meta">All supplier purchases</div>
+            </div>
+
+            <div class="supplier-stat-card">
+                <div class="supplier-stat-top">
+                    <div class="supplier-stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                </div>
+                <div class="supplier-stat-title">At-Risk Suppliers</div>
+                <div class="supplier-stat-value">{{ sup.stats.atRiskSuppliers }}</div>
+                <div class="supplier-stat-meta">Linked to low stock medicines</div>
+            </div>
+        </div>
+
+        <!-- Main card -->
+        <div class="suppliers-main-card">
+
+            <!-- Toolbar -->
+            <div class="suppliers-toolbar">
+                <div class="suppliers-search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="suppliers-search-input" placeholder="Search suppliers..."
+                        ng-model="sup.searchText" ng-change="sup.applyFilters()">
+                </div>
+
+                <div class="suppliers-toolbar-actions">
+                    <button class="add-supplier-btn" ng-click="sup.openAddModal()">
+                        <i class="fa-solid fa-circle-plus"></i>
+                        Add New Supplier
+                    </button>
+
+                    <button class="filter-btn" ng-click="sup.toggleFilters()">
+                        <i class="fa-solid fa-sliders"></i>
+                        Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="suppliers-filters-panel" ng-if="sup.showFilters">
+                <div class="suppliers-filters-grid">
+                    <div>
+                        <label class="suppliers-filter-label">Category</label>
+                        <select class="suppliers-filter-select" ng-model="sup.filters.category"
+                            ng-change="sup.applyFilters()">
+                            <option value="">All Categories</option>
+                            <option ng-repeat="cat in sup.categories track by cat" value="{{ cat }}">{{ cat }}</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="suppliers-filter-label">Purchase Activity</label>
+                        <select class="suppliers-filter-select" ng-model="sup.filters.activity"
+                            ng-change="sup.applyFilters()">
+                            <option value="">All Suppliers</option>
+                            <option value="30days">Purchased in last 30 days</option>
+                            <option value="never">Never purchased</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="suppliers-filter-label">Stock Risk</label>
+                        <select class="suppliers-filter-select" ng-model="sup.filters.stockRisk"
+                            ng-change="sup.applyFilters()">
+                            <option value="">All</option>
+                            <option value="risk">Has low stock medicines</option>
+                            <option value="safe">No low stock medicines</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="suppliers-filter-label">Purchase Value</label>
+                        <select class="suppliers-filter-select" ng-model="sup.filters.purchaseValue"
+                            ng-change="sup.applyFilters()">
+                            <option value="">All</option>
+                            <option value="low">Below $500</option>
+                            <option value="mid">$500 - $2000</option>
+                            <option value="high">Above $2000</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="suppliers-filters-reset-wrap">
+                    <button class="filter-btn" ng-click="sup.resetFilters()">Reset</button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="suppliers-table-wrap">
+                <table class="suppliers-table">
+                    <thead>
+                        <tr>
+                            <th>Supplier ID</th>
+                            <th>Supplier Name</th>
+                            <th>Contact</th>
+                            <th>Medicines Supplied</th>
+                            <th>Total Purchased Qty</th>
+                            <th>Total Purchase Value</th>
+                            <th>Last Purchase Date</th>
+                            <th>Low Stock Items</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="supplier in sup.pagedSuppliers track by supplier.supplier_id">
+                            <td>#SUP{{ supplier.supplier_id }}</td>
+                            <td>{{ supplier.name }}</td>
+                            <td>{{ supplier.contact || '-' }}</td>
+                            <td>{{ supplier.medicines_supplied }}</td>
+                            <td>{{ supplier.total_purchased_qty }}</td>
+                            <td>{{ sup.formatCurrency(supplier.total_purchase_value) }}</td>
+                            <td>{{ sup.formatDate(supplier.last_purchase_date) }}</td>
+                            <td>{{ supplier.low_stock_items }}</td>
+                            <td class="text-center">
+                                <div class="table-actions">
+                                    <button class="action-btn" type="button" ng-click="sup.openEditModal(supplier)">
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </button>
+                                    <button class="action-btn danger" type="button"
+                                        ng-click="sup.deleteSupplier(supplier.supplier_id)">
+                                        <i class="fa-regular fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr ng-if="sup.pagedSuppliers.length === 0">
+                            <td colspan="9" class="suppliers-empty">No suppliers found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="suppliers-pagination-wrap">
+                <div class="suppliers-pagination-info">
+                    Showing
+                    <span class="suppliers-page-size">{{ sup.pagination.pageSize }}</span>
+                    out of {{ sup.filteredSuppliers.length }}
+                </div>
+
+                <div class="suppliers-pagination">
+                    <button ng-repeat="page in sup.getPageNumbers() track by page" class="suppliers-page-btn"
+                        ng-class="{active: sup.pagination.currentPage === page}" ng-click="sup.changePage(page)">
+                        {{ page }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Modal -->
+        <div class="suppliers-modal-backdrop" ng-if="sup.showAddModal">
+            <div class="suppliers-modal">
+                <div class="suppliers-modal-head">
+                    <h3>Add New Supplier</h3>
+                    <button class="suppliers-modal-close" ng-click="sup.closeAddModal()">&times;</button>
+                </div>
+
+                <div class="suppliers-modal-body">
+                    <div class="suppliers-form-grid">
+                        <div>
+                            <label class="suppliers-filter-label">Supplier Name</label>
+                            <input class="suppliers-filter-input" ng-model="sup.newSupplier.name">
+                        </div>
+                        <div>
+                            <label class="suppliers-filter-label">Contact</label>
+                            <input class="suppliers-filter-input" ng-model="sup.newSupplier.contact">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="suppliers-modal-footer">
+                    <button class="filter-btn" ng-click="sup.closeAddModal()">Cancel</button>
+                    <button class="add-supplier-btn" ng-click="sup.addSupplier()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="suppliers-modal-backdrop" ng-if="sup.showEditModal">
+            <div class="suppliers-modal">
+                <div class="suppliers-modal-head">
+                    <h3>Edit Supplier</h3>
+                    <button class="suppliers-modal-close" ng-click="sup.closeEditModal()">&times;</button>
+                </div>
+
+                <div class="suppliers-modal-body" ng-if="sup.editSupplierData">
+                    <div class="suppliers-form-grid">
+                        <div>
+                            <label class="suppliers-filter-label">Supplier Name</label>
+                            <input class="suppliers-filter-input" ng-model="sup.editSupplierData.name">
+                        </div>
+                        <div>
+                            <label class="suppliers-filter-label">Contact</label>
+                            <input class="suppliers-filter-input" ng-model="sup.editSupplierData.contact">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="suppliers-modal-footer">
+                    <button class="filter-btn" ng-click="sup.closeEditModal()">Cancel</button>
+                    <button class="add-supplier-btn" ng-click="sup.updateSupplier()">Update</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
