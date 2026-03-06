@@ -91,14 +91,14 @@ app
   })
 
   //     // Route guard: block /app/* if not logged in
-//   .run(function ($rootScope, $location, AuthService) {
-//     $rootScope.$on("$routeChangeStart", async function (event, next) {
-//       if (next && next.data && next.data.requiresAuth) {
-//         const ok = await AuthService.isAuthenticated();
-//         if (!ok) {
-//           event.preventDefault();
-//           $location.path("/login");
-//         }
-//       }
-//     });
-//   });
+  // .run(function ($rootScope, $location, AuthService) {
+  //   $rootScope.$on("$routeChangeStart", async function (event, next) {
+  //     if (next && next.data && next.data.requiresAuth) {
+  //       const ok = await AuthService.isAuthenticated();
+  //       if (!ok) {
+  //         event.preventDefault();
+  //         $location.path("/login");
+  //       }
+  //     }
+  //   });
+  // });

@@ -1,129 +1,242 @@
-app.controller("productsCtrl", function ($scope) {
-  var md = this;
+app.controller("ProductsCtrl", function ($scope, $q) {
+  var vm = this;
 
-  md.loading = false;
-  md.error = "";
-  md.items = [];
-  md.selected = {};
+  const SUPABASE_URL = "https://vvvlzxywfltgrnzimdru.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_5iONbaBdSVH8Lv7Tn98Xvw_iniQ52Wa";
 
-  md.q = "";
-  md.category = "";
-  md.stock = "";
-  md.categories = [];
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  var modal = null;
-  function ensureModal() {
-    if (!modal) {
-      modal = new bootstrap.Modal(document.getElementById("medicineDetailsModal"));
+  vm.loading = true;
+  vm.q = "";
+  vm.items = [];
+  vm.filtered = [];
+  vm.suppliers = [];
+
+  vm.lowStockThreshold = 10;
+  vm.expiringDays = 30;
+
+  vm.stats = { total: 0, lowStock: 0, expiringSoon: 0, categories: 0 };
+
+  vm.modal = {
+    mode: "add",
+    form: {},
+    saving: false,
+    error: "",
+  };
+
+  var modalInstance = null;
+
+  vm.init = function () {
+    vm.loading = true;
+
+    $q.all([vm.loadSuppliers(), vm.loadMedicines()])
+      .then(function () {
+        vm.applyFilter();
+        vm.computeStats();
+      })
+      .finally(function () {
+        vm.loading = false;
+      });
+  };
+  vm.showFilters = false;
+
+  vm.filters = {
+    category: "",
+    supplier: "",
+    lowStock: false,
+  };
+
+  vm.toggleFilters = function () {
+    vm.showFilters = !vm.showFilters;
+  };
+
+  vm.clearFilters = function () {
+    vm.filters.category = "";
+    vm.filters.supplier = "";
+    vm.filters.lowStock = false;
+    vm.applyFilter();
+  };
+
+  vm.loadSuppliers = function () {
+    return $q(function (resolve, reject) {
+      sb.from("suppliers")
+        .select("supplier_id,name")
+        .order("name", { ascending: true })
+        .then(function (res) {
+          if (res.error) return reject(res.error);
+          vm.suppliers = res.data || [];
+          resolve(true);
+          $scope.$applyAsync();
+        });
+    });
+  };
+
+  vm.loadMedicines = function () {
+    return $q(function (resolve, reject) {
+      sb.from("medicines")
+        .select("*")
+        .then(function (res) {
+          console.log("MEDICINES RES:", res); // <-- IMPORTANT
+          if (res.error) return reject(res.error);
+          vm.items = res.data || [];
+          resolve(true);
+          $scope.$applyAsync();
+        });
+    });
+  };
+
+  vm.applyFilter = function () {
+    var q = (vm.q || "").toLowerCase().trim();
+
+    if (!q) {
+      vm.filtered = vm.items.slice();
+      return;
     }
-  }
 
-  md.money = function (v) {
-    if (v === null || v === undefined || v === "") return "—";
-    var n = Number(v);
-    if (Number.isNaN(n)) return v;
-    return n.toLocaleString(undefined, { style: "currency", currency: "USD" });
+    vm.filtered = vm.items.filter(function (m) {
+      return (
+        (m.name || "").toLowerCase().includes(q) ||
+        (m.category || "").toLowerCase().includes(q) ||
+        (m.supplier_name || "").toLowerCase().includes(q)
+      );
+    });
   };
 
-  md.date = function (v) {
-    if (!v) return "—";
-    var d = new Date(v);
-    if (isNaN(d.getTime())) return v;
-    return d.toLocaleDateString();
-  };
+  vm.computeStats = function () {
+    vm.stats.total = vm.items.length;
 
-  md.dateTime = function (v) {
-    if (!v) return "—";
-    var d = new Date(v);
-    if (isNaN(d.getTime())) return v;
-    return d.toLocaleString();
-  };
+    vm.stats.lowStock = vm.items.filter(function (m) {
+      return (m.quantity || 0) <= vm.lowStockThreshold;
+    }).length;
 
-  md.stockLabel = function (m) {
-    var q = Number((m && m.quantity) ?? 0);
-    if (q <= 0) return "Out of stock";
-    if (q <= 10) return "Low stock";
-    return "In stock";
-  };
-
-  md.badgeClass = function (m) {
-    var q = Number((m && m.quantity) ?? 0);
-    if (q <= 0) return "badge-out";
-    if (q <= 10) return "badge-low";
-    return "badge-ok";
-  };
-
-  // Filters
-  md.search = function (m) {
-    if (!md.q) return true;
-    var q = md.q.toLowerCase();
-    return (
-      (m.name || "").toLowerCase().includes(q) ||
-      (m.category || "").toLowerCase().includes(q) ||
-      (m.description || "").toLowerCase().includes(q)
+    var now = new Date();
+    var cutoff = new Date(
+      now.getTime() + vm.expiringDays * 24 * 60 * 60 * 1000,
     );
+
+    vm.stats.expiringSoon = vm.items.filter(function (m) {
+      if (!m.expiry_date) return false;
+      return new Date(m.expiry_date) <= cutoff;
+    }).length;
+
+    var cats = {};
+    vm.items.forEach(function (m) {
+      if (m.category) cats[m.category] = true;
+    });
+    vm.stats.categories = Object.keys(cats).length;
   };
 
-  md.catFn = function (m) {
-    if (!md.category) return true;
-    return (m.category || "") === md.category;
+  vm.openAddModal = function () {
+    vm.modal.mode = "add";
+    vm.modal.error = "";
+    vm.modal.form = {
+      supplier_id: "",
+      name: "",
+      description: "",
+      price: 0,
+      quantity: 0,
+      category: "",
+      expiry_date: null,
+      image_url: "",
+    };
+    vm.showModal();
   };
 
-  md.stockFn = function (m) {
-    if (!md.stock) return true;
-    var qty = Number((m && m.quantity) ?? 0);
-    if (md.stock === "out") return qty <= 0;
-    if (md.stock === "low") return qty > 0 && qty <= 10;
-    return true;
+  vm.openEditModal = function (m) {
+    vm.modal.mode = "edit";
+    vm.modal.error = "";
+    vm.modal.form = {
+      medicine_id: m.medicine_id,
+      supplier_id: m.supplier_id,
+      name: m.name,
+      description: m.description,
+      price: m.price,
+      quantity: m.quantity,
+      category: m.category,
+      expiry_date: m.expiry_date,
+      image_url: m.image_url,
+    };
+    vm.showModal();
   };
 
-  md.open = function (m) {
-    md.selected = m;
-    $scope.$applyAsync();
-    ensureModal();
-    modal.show();
+  vm.showModal = function () {
+    var el = document.getElementById("medicineModal");
+    modalInstance = bootstrap.Modal.getOrCreateInstance(el);
+    modalInstance.show();
   };
 
-  md.load = async function () {
-    md.loading = true;
-    md.error = "";
-    $scope.$applyAsync();
+  vm.hideModal = function () {
+    if (modalInstance) modalInstance.hide();
+  };
 
-    try {
-      // Requires `supabase` from supabaseClient.js loaded globally
-      var res = await supabase
+  vm.saveMedicine = function () {
+    vm.modal.error = "";
+    vm.modal.saving = true;
+
+    var payload = {
+      supplier_id: vm.modal.form.supplier_id,
+      name: vm.modal.form.name,
+      description: vm.modal.form.description || null,
+      price: Number(vm.modal.form.price),
+      quantity: Number(vm.modal.form.quantity),
+      category: vm.modal.form.category || null,
+      expiry_date: vm.modal.form.expiry_date || null,
+      image_url: vm.modal.form.image_url || null,
+    };
+
+    console.log("Saving medicine...", payload);
+
+    var req;
+    if (vm.modal.mode === "add") {
+      req = sb.from("medicines").insert([payload]);
+    } else {
+      req = sb
         .from("medicines")
-        .select(`
-          medicine_id,
-          supplier_id,
-          name,
-          description,
-          price,
-          quantity,
-          category,
-          expiry_date,
-          image_url,
-          created_at,
-          suppliers:supplier_id ( name, contact )
-        `)
-        .order("created_at", { ascending: false });
-
-      if (res.error) throw res.error;
-
-      md.items = res.data || [];
-
-      // build categories
-      var set = new Set();
-      md.items.forEach(function (x) { if (x.category) set.add(x.category); });
-      md.categories = Array.from(set).sort();
-
-    } catch (e) {
-      md.error = e.message || "Failed to load medicines.";
-    } finally {
-      md.loading = false;
-      $scope.$applyAsync();
+        .update(payload)
+        .eq("medicine_id", vm.modal.form.medicine_id);
     }
+
+    req
+      .then(function (res) {
+        if (res.error) throw res.error;
+        return vm.loadSuppliers().then(vm.loadMedicines);
+      })
+      .then(function () {
+        vm.applyFilter();
+        vm.computeStats();
+        vm.hideModal();
+      })
+      .catch(function (err) {
+        console.error("Save error:", err);
+        vm.modal.error = err.message || "Failed to save medicine";
+      })
+      .finally(function () {
+        vm.modal.saving = false;
+        $scope.$applyAsync();
+      });
   };
 
-  md.load();
+  vm.confirmDelete = function (m) {
+    if (!confirm("Delete " + m.name + "?")) return;
+
+    sb.from("medicines")
+      .delete()
+      .eq("medicine_id", m.medicine_id)
+      .then(function (res) {
+        if (res.error) throw res.error;
+        return vm.loadSuppliers().then(vm.loadMedicines);
+      })
+      .then(function () {
+        vm.applyFilter();
+        vm.computeStats();
+      })
+      .catch(function (err) {
+        alert(err.message || "Delete failed");
+      })
+      .finally(function () {
+        $scope.$applyAsync();
+      });
+  };
+
+  vm.init();
 });
