@@ -78,7 +78,7 @@ app
         controller: "AppShellCtrl",
         controllerAs: "vm",
         data: {
-          requiresAuth: false,
+          requiresAuth: true,
           title: "Suppliers",
           pageTemplate: "app/views/app/suppliers.html",
         },

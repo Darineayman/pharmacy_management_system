@@ -1,6 +1,20 @@
-app.controller('AppShellCtrl', function ($route) {
-    var vm = this;
+app.controller("AppShellCtrl", function ($route, $rootScope) {
+  var vm = this;
 
-    vm.title = ($route.current && $route.current.data && $route.current.data.title) || '';
-    vm.pageTemplate = ($route.current && $route.current.data && $route.current.data.pageTemplate) || '';
+  vm.title = "";
+  vm.pageTemplate = "";
+
+  function updateFromRoute() {
+    var current = $route.current;
+    var routeData = current && current.$$route && current.$$route.data;
+
+    vm.title = (routeData && routeData.title) || "";
+    vm.pageTemplate = (routeData && routeData.pageTemplate) || "";
+  }
+
+  updateFromRoute();
+
+  $rootScope.$on("$routeChangeSuccess", function () {
+    updateFromRoute();
+  });
 });

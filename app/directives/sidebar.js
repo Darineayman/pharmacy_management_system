@@ -1,8 +1,7 @@
-angular.module('pharmly')
-    .directive('appSidebar', function () {
-        return {
-            restrict: 'E',
-            template: `
+angular.module("pharmly").directive("appSidebar", function () {
+  return {
+    restrict: "E",
+    template: `
                     <aside class="sidebar">
                         <div class="brand">
                         <div class="brand-badge"></div>
@@ -32,16 +31,16 @@ angular.module('pharmly')
                         </div>
                     </aside>
                     `,
-            controller: function ($scope, $location, AuthService) {
-                $scope.isActive = function (path) {
-                    return $location.path() === path;
-                };
+    controller: function ($scope, $location, authService) {
+      $scope.isActive = function (path) {
+        return $location.path() === path;
+      };
 
-                $scope.logout = async function () {
-                    await AuthService.logout();
-                    $location.path('/login');
-                    $scope.$applyAsync();
-                };
-            }
-        };
-    });
+      $scope.logout = async function () {
+        await authService.logout();
+        $location.path("/login");
+        $scope.$applyAsync();
+      };
+    },
+  };
+});
