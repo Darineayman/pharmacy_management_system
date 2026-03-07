@@ -1,5 +1,4 @@
 <div class="app-content" ng-controller="ProductsCtrl as vm">
-  <!-- Top section (cards + actions) -->
   <div class="page-head">
     <div class="stats-row">
       <div class="kpi-card kpi-accent">
@@ -112,7 +111,6 @@
     </div>
   </div>
 
-  <!-- Table -->
   <div class="table-card">
     <div class="table-head">
       <div class="table-title">Medicines</div>
@@ -168,10 +166,10 @@
               <span
                 class="pill"
                 ng-class="{
-                      'pill-ok': m.quantity > vm.lowStockThreshold,
-                      'pill-warn': m.quantity <= vm.lowStockThreshold && m.quantity > 0,
-                      'pill-bad': m.quantity === 0
-                    }"
+                  'pill-ok': m.quantity > vm.lowStockThreshold,
+                  'pill-warn': m.quantity <= vm.lowStockThreshold && m.quantity > 0,
+                  'pill-bad': m.quantity === 0
+                }"
               >
                 {{ m.quantity }}
               </span>
@@ -203,10 +201,7 @@
         </tbody>
       </table>
     </div>
-<<<<<<< HEAD
-    
-=======
->>>>>>> main
+
     <div class="table-pagination">
       <div class="pagination-info">
         <span>Showing</span>
@@ -245,17 +240,12 @@
           ng-click="vm.goToPage(vm.currentPage + 1)"
           ng-disabled="vm.currentPage === vm.totalPages"
         >
-<<<<<<< HEAD
-          >
-=======
           ›
->>>>>>> main
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Add/Edit Modal -->
   <div class="modal fade" id="medicineModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content modal-dark">
@@ -378,9 +368,7 @@
               class="btn btn-primary"
               ng-disabled="vm.modal.saving"
             >
-              {{ vm.modal.saving ? (vm.modal.mode === 'add' ? 'Adding...' :
-              'Updating...') : (vm.modal.mode === 'add' ? 'Add Medicine' :
-              'Update Medicine') }}
+              {{ vm.modal.saving ? (vm.modal.mode === 'add' ? 'Adding...' : 'Updating...') : (vm.modal.mode === 'add' ? 'Add Medicine' : 'Update Medicine') }}
             </button>
           </div>
         </form>

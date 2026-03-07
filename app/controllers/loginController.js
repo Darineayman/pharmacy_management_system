@@ -1,4 +1,3 @@
-// app/controllers/login.controller.js
 app.controller("LoginController", function ($location, authService) {
   var vm = this;
 
