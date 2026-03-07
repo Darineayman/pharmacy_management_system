@@ -1,247 +1,212 @@
-<div class="app-content" ng-controller="ProductsCtrl as vm">
+<div ng-controller="ProductsCtrl as vm">
   <div class="page-head">
-    <div class="stats-row">
-      <div class="kpi-card kpi-accent">
-        <div class="kpi-label">Total Medicines</div>
-        <div class="kpi-value">{{ vm.stats.total }}</div>
-        <div class="kpi-sub">In inventory</div>
+    <div class="suppliers-stats-row">
+      <div class="supplier-stat-card supplier-stat-card-dark">
+        <div class="supplier-stat-top">
+          <div class="supplier-stat-icon"><i class="fa-solid fa-capsules"></i></div>
+          <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+        </div>
+        <div class="stat-bg-icon"><i class="fa-solid fa-capsules"></i></div>
+        <div class="supplier-stat-title">Total Medicines</div>
+        <div class="supplier-stat-value">{{ vm.stats.total }}</div>
+        <div class="supplier-stat-meta">In inventory</div>
       </div>
 
-      <div class="kpi-card">
-        <div class="kpi-label">Low Stock</div>
-        <div class="kpi-value">{{ vm.stats.lowStock }}</div>
-        <div class="kpi-sub">Qty ≤ {{ vm.lowStockThreshold }}</div>
+      <div class="supplier-stat-card">
+        <div class="supplier-stat-top">
+          <div class="supplier-stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+        </div>
+        <div class="stat-bg-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="supplier-stat-title">Low Stock</div>
+        <div class="supplier-stat-value">{{ vm.stats.lowStock }}</div>
+        <div class="supplier-stat-meta">Qty ≤ {{ vm.lowStockThreshold }}</div>
       </div>
 
-      <div class="kpi-card">
-        <div class="kpi-label">Expiring Soon</div>
-        <div class="kpi-value">{{ vm.stats.expiringSoon }}</div>
-        <div class="kpi-sub">Next {{ vm.expiringDays }} days</div>
+      <div class="supplier-stat-card">
+        <div class="supplier-stat-top">
+          <div class="supplier-stat-icon"><i class="fa-regular fa-calendar-xmark"></i></div>
+          <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+        </div>
+        <div class="stat-bg-icon"><i class="fa-regular fa-calendar-xmark"></i></div>
+        <div class="supplier-stat-title">Expiring Soon</div>
+        <div class="supplier-stat-value">{{ vm.stats.expiringSoon }}</div>
+        <div class="supplier-stat-meta">Next {{ vm.expiringDays }} days</div>
       </div>
 
-      <div class="kpi-card">
-        <div class="kpi-label">Categories</div>
-        <div class="kpi-value">{{ vm.stats.categories }}</div>
-        <div class="kpi-sub">Distinct</div>
+      <div class="supplier-stat-card">
+        <div class="supplier-stat-top">
+          <div class="supplier-stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+          <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+        </div>
+        <div class="stat-bg-icon"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="supplier-stat-title">Categories</div>
+        <div class="supplier-stat-value">{{ vm.stats.categories }}</div>
+        <div class="supplier-stat-meta">Distinct</div>
       </div>
     </div>
 
-    <div class="toolbar toolbar-order-style">
-      <div class="searchbox searchbox-order-style">
-        <span class="search-ico">⌕</span>
-        <input
-          class="search-input"
-          type="text"
-          placeholder="Search..."
-          ng-model="vm.q"
-          ng-change="vm.applyFilters()"
-        />
-      </div>
-
-      <div class="toolbar-actions toolbar-actions-order-style">
-        <button
-          class="add-medicine-btn"
-          type="button"
-          ng-click="vm.openAddModal()"
-        >
-          <span class="add-icon">+</span>
-          <span>Add New Medicine</span>
-        </button>
-
-        <button
-          class="filter-btn-order"
-          type="button"
-          ng-click="vm.toggleFilters()"
-        >
-          <span class="filter-icon">⌯</span>
-          <span>Filters</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="filters-popover" ng-show="vm.showFilters">
-      <div class="filters-grid">
-        <div class="filter-group">
-          <label>Category</label>
-          <select
-            class="filter-input"
-            ng-model="vm.filters.category"
-            ng-change="vm.applyFilters()"
-          >
-            <option value="">All Categories</option>
-            <option ng-repeat="c in vm.categories" value="{{c}}">{{c}}</option>
-          </select>
+    <div class="orders-main-card">
+      <div class="toolbar toolbar-order-style">
+        <div class="searchbox searchbox-order-style">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input class="search-input" type="text" placeholder="Search products..." ng-model="vm.q"
+            ng-change="vm.applyFilters()" />
         </div>
 
-        <div class="filter-group">
-          <label>Supplier</label>
-          <select
-            class="filter-input"
-            ng-model="vm.filters.supplier"
-            ng-change="vm.applyFilters()"
-          >
-            <option value="">All Suppliers</option>
-            <option ng-repeat="s in vm.suppliers" value="{{s.supplier_id}}">
-              {{s.name}}
-            </option>
-          </select>
-        </div>
+        <div class="toolbar-actions toolbar-actions-order-style">
+          <button class="add-medicine-btn" type="button" ng-click="vm.openAddModal()">
+            <span class="add-icon">+</span>
+            <span>Add New Medicine</span>
+          </button>
 
-        <div class="filter-group filter-check-group">
-          <label class="check-row">
-            <input
-              type="checkbox"
-              ng-model="vm.filters.lowStock"
-              ng-change="vm.applyFilters()"
-            />
-            Low stock only
-          </label>
+          <button class="filter-btn-order" type="button" ng-click="vm.toggleFilters()">
+            <i class="fa-solid fa-sliders"></i>
+
+            <span>Filters</span>
+          </button>
         </div>
       </div>
 
-      <div class="filters-actions">
-        <button
-          class="reset-filter-btn"
-          type="button"
-          ng-click="vm.clearFilters()"
-        >
-          Reset
-        </button>
+      <div class="filters-popover" ng-show="vm.showFilters">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label>Category</label>
+            <select class="filter-input" ng-model="vm.filters.category" ng-change="vm.applyFilters()">
+              <option value="">All Categories</option>
+              <option ng-repeat="c in vm.categories" value="{{c}}">{{c}}</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Supplier</label>
+            <select class="filter-input" ng-model="vm.filters.supplier" ng-change="vm.applyFilters()">
+              <option value="">All Suppliers</option>
+              <option ng-repeat="s in vm.suppliers" value="{{s.supplier_id}}">
+                {{s.name}}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group filter-check-group">
+            <label class="check-row">
+              <input type="checkbox" ng-model="vm.filters.lowStock" ng-change="vm.applyFilters()" />
+              Low stock only
+            </label>
+          </div>
+        </div>
+
+        <div class="filters-actions">
+          <button class="reset-filter-btn" type="button" ng-click="vm.clearFilters()">
+            Reset
+          </button>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <div class="table-card">
-    <div class="table-head">
-      <div class="table-title">Medicines</div>
-      <div class="muted" ng-if="vm.loading">Loading…</div>
-      <div class="muted" ng-if="!vm.loading">
-        Showing {{ vm.filtered.length }} items
-      </div>
-    </div>
+      <div class="table-card">
+        <div class="table-head">
+          <div class="table-title">Medicines</div>
+          <div class="muted" ng-if="vm.loading">Loading…</div>
+          <div class="muted" ng-if="!vm.loading">
+            Showing {{ vm.filtered.length }} items
+          </div>
+        </div>
 
-    <div class="table-wrap">
-      <table class="table table-darkx">
-        <thead>
-          <tr>
-            <th style="width: 64px">Image</th>
-            <th>Name</th>
-            <th style="width: 170px">Supplier</th>
-            <th style="width: 140px">Category</th>
-            <th style="width: 110px">Price</th>
-            <th style="width: 110px">Qty</th>
-            <th style="width: 140px">Expiry</th>
-            <th style="width: 130px">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr ng-if="!vm.loading && vm.filtered.length === 0">
-            <td colspan="8" class="empty-state">No medicines found.</td>
-          </tr>
+        <div class="table-wrap">
+          <table class="table table-darkx">
+            <thead>
+              <tr>
+                <th style="width: 64px">Image</th>
+                <th>Name</th>
+                <th style="width: 170px">Supplier</th>
+                <th style="width: 140px">Category</th>
+                <th style="width: 110px">Price</th>
+                <th style="width: 110px">Qty</th>
+                <th style="width: 140px">Expiry</th>
+                <th style="width: 130px">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-if="!vm.loading && vm.filtered.length === 0">
+                <td colspan="8" class="empty-state">No medicines found.</td>
+              </tr>
 
-          <tr ng-repeat="m in vm.pagedItems track by m.medicine_id">
-            <td>
-              <div class="thumb">
-                <img
-                  ng-if="m.image_url"
-                  ng-src="{{m.image_url}}"
-                  alt="medicine"
-                />
-                <div class="thumb-fallback" ng-if="!m.image_url">💊</div>
-              </div>
-            </td>
+              <tr ng-repeat="m in vm.pagedItems track by m.medicine_id">
+                <td>
+                  <div class="thumb">
+                    <img ng-if="m.image_url" ng-src="{{m.image_url}}" alt="medicine" />
+                    <div class="thumb-fallback" ng-if="!m.image_url">💊</div>
+                  </div>
+                </td>
 
-            <td>
-              <div class="name-col">
-                <div class="name">{{ m.name }}</div>
-                <div class="desc muted">{{ m.description || '—' }}</div>
-              </div>
-            </td>
+                <td>
+                  <div class="name-col">
+                    <div class="name">{{ m.name }}</div>
+                    <div class="desc muted">{{ m.description || '—' }}</div>
+                  </div>
+                </td>
 
-            <td class="muted">{{ m.supplier_name || '—' }}</td>
-            <td class="muted">{{ m.category || '—' }}</td>
-            <td class="muted">{{ m.price | currency:"$":2 }}</td>
+                <td class="muted">{{ m.supplier_name || '—' }}</td>
+                <td class="muted">{{ m.category || '—' }}</td>
+                <td class="muted">{{ m.price | currency:"$":2 }}</td>
 
-            <td>
-              <span
-                class="pill"
-                ng-class="{
+                <td>
+                  <span class="pill" ng-class="{
                   'pill-ok': m.quantity > vm.lowStockThreshold,
                   'pill-warn': m.quantity <= vm.lowStockThreshold && m.quantity > 0,
                   'pill-bad': m.quantity === 0
-                }"
-              >
-                {{ m.quantity }}
-              </span>
-            </td>
+                }">
+                    {{ m.quantity }}
+                  </span>
+                </td>
 
-            <td class="muted">
-              {{ m.expiry_date ? (m.expiry_date | date:'yyyy-MM-dd') : '—' }}
-            </td>
+                <td class="muted">
+                  {{ m.expiry_date ? (m.expiry_date | date:'yyyy-MM-dd') : '—' }}
+                </td>
 
-            <td>
-              <div class="row-actions">
-                <button
-                  class="icon-btn"
-                  title="Edit"
-                  ng-click="vm.openEditModal(m)"
-                >
-                  ✎
-                </button>
-                <button
-                  class="icon-btn danger"
-                  title="Delete"
-                  ng-click="vm.confirmDelete(m)"
-                >
-                  🗑
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+                <td>
+                  <div class="table-actions">
+                    <button class="action-btn" title="Edit" ng-click="vm.openEditModal(m)">
+                      <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
+                    <button class="action-btn danger" title="Delete" ng-click="vm.confirmDelete(m)">
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-    <div class="table-pagination">
-      <div class="pagination-info">
-        <span>Showing</span>
+        <div class="table-pagination">
+          <div class="pagination-info">
+            <span>Showing</span>
 
-        <select
-          class="page-size-select"
-          ng-model="vm.pageSize"
-          ng-options="size for size in vm.pageSizeOptions"
-          ng-change="vm.changePageSize()"
-        ></select>
+            <select class="page-size-select" ng-model="vm.pageSize" ng-options="size for size in vm.pageSizeOptions"
+              ng-change="vm.changePageSize()"></select>
 
-        <span>out of {{ vm.filtered.length }}</span>
-      </div>
+            <span>out of {{ vm.filtered.length }}</span>
+          </div>
 
-      <div class="pagination-controls" ng-if="vm.totalPages > 1">
-        <button
-          class="page-btn nav-btn"
-          ng-click="vm.goToPage(vm.currentPage - 1)"
-          ng-disabled="vm.currentPage === 1"
-        >
-          ‹
-        </button>
+          <div class="pagination-controls" ng-if="vm.totalPages > 1">
+            <button class="page-btn nav-btn" ng-click="vm.goToPage(vm.currentPage - 1)"
+              ng-disabled="vm.currentPage === 1">
+              ‹
+            </button>
 
-        <button
-          class="page-btn"
-          ng-repeat="page in vm.getVisiblePages() track by $index"
-          ng-class="{ active: vm.currentPage === page, ellipsis: page === '...' }"
-          ng-click="page !== '...' && vm.goToPage(page)"
-          ng-disabled="page === '...'"
-        >
-          {{ page }}
-        </button>
+            <button class="page-btn" ng-repeat="page in vm.getVisiblePages() track by $index"
+              ng-class="{ active: vm.currentPage === page, ellipsis: page === '...' }"
+              ng-click="page !== '...' && vm.goToPage(page)" ng-disabled="page === '...'">
+              {{ page }}
+            </button>
 
-        <button
-          class="page-btn nav-btn"
-          ng-click="vm.goToPage(vm.currentPage + 1)"
-          ng-disabled="vm.currentPage === vm.totalPages"
-        >
-          ›
-        </button>
+            <button class="page-btn nav-btn" ng-click="vm.goToPage(vm.currentPage + 1)"
+              ng-disabled="vm.currentPage === vm.totalPages">
+              ›
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -253,12 +218,7 @@
           <h5 class="modal-title">
             {{ vm.modal.mode === 'add' ? 'Add New Medicine' : 'Edit Medicine' }}
           </h5>
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
         <form ng-submit="vm.saveMedicine()" novalidate>
@@ -266,86 +226,47 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="label">Name</label>
-                <input
-                  class="input"
-                  type="text"
-                  ng-model="vm.modal.form.name"
-                  required
-                />
+                <input class="input" type="text" ng-model="vm.modal.form.name" required />
               </div>
 
               <div class="col-md-6">
                 <label class="label">Supplier</label>
-                <select
-                  class="input"
-                  ng-model="vm.modal.form.supplier_id"
-                  ng-options="s.supplier_id as s.name for s in vm.suppliers"
-                  required
-                >
+                <select class="input" ng-model="vm.modal.form.supplier_id"
+                  ng-options="s.supplier_id as s.name for s in vm.suppliers" required>
                   <option value="">Select supplier…</option>
                 </select>
               </div>
 
               <div class="col-md-12">
                 <label class="label">Description</label>
-                <input
-                  class="input"
-                  type="text"
-                  ng-model="vm.modal.form.description"
-                />
+                <input class="input" type="text" ng-model="vm.modal.form.description" />
               </div>
 
               <div class="col-md-3">
                 <label class="label">Price</label>
-                <input
-                  class="input"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  ng-model="vm.modal.form.price"
-                  required
-                />
+                <input class="input" type="number" step="0.01" min="0" ng-model="vm.modal.form.price" required />
               </div>
 
               <div class="col-md-3">
                 <label class="label">Quantity</label>
-                <input
-                  class="input"
-                  type="number"
-                  min="0"
-                  ng-model="vm.modal.form.quantity"
-                  required
-                />
+                <input class="input" type="number" min="0" ng-model="vm.modal.form.quantity" required />
               </div>
 
               <div class="col-md-3">
                 <label class="label">Category</label>
-                <select
-                  class="input"
-                  ng-model="vm.modal.form.category"
-                  ng-options="c for c in vm.categories"
-                >
+                <select class="input" ng-model="vm.modal.form.category" ng-options="c for c in vm.categories">
                   <option value="">Select category…</option>
                 </select>
               </div>
 
               <div class="col-md-3">
                 <label class="label">Expiry Date</label>
-                <input
-                  class="input"
-                  type="date"
-                  ng-model="vm.modal.form.expiry_date"
-                />
+                <input class="input" type="date" ng-model="vm.modal.form.expiry_date" />
               </div>
 
               <div class="col-md-12">
                 <label class="label">Image URL</label>
-                <input
-                  class="input"
-                  type="url"
-                  placeholder="https://..."
-                  ng-model="vm.modal.form.image_url"
-                />
+                <input class="input" type="url" placeholder="https://..." ng-model="vm.modal.form.image_url" />
               </div>
             </div>
 
@@ -355,20 +276,12 @@
           </div>
 
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-ghost"
-              data-bs-dismiss="modal"
-              ng-click="vm.modal.error = ''"
-            >
+            <button type="button" class="btn btn-ghost" data-bs-dismiss="modal" ng-click="vm.modal.error = ''">
               Cancel
             </button>
-            <button
-              type="submit"
-              class="btn btn-primary"
-              ng-disabled="vm.modal.saving"
-            >
-              {{ vm.modal.saving ? (vm.modal.mode === 'add' ? 'Adding...' : 'Updating...') : (vm.modal.mode === 'add' ? 'Add Medicine' : 'Update Medicine') }}
+            <button type="submit" class="btn btn-primary" ng-disabled="vm.modal.saving">
+              {{ vm.modal.saving ? (vm.modal.mode === 'add' ? 'Adding...' : 'Updating...') : (vm.modal.mode === 'add' ?
+              'Add Medicine' : 'Update Medicine') }}
             </button>
           </div>
         </form>

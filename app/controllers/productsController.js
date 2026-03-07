@@ -1,4 +1,4 @@
-app.controller("ProductsCtrl", function ($scope, $q, medicinesApi, suppliersApi) {
+app.controller("ProductsCtrl", function ($scope, $q, medicinesApi, suppliersApi, purchasesApi) {
   var vm = this;
 
   vm.loading = true;
@@ -37,9 +37,9 @@ app.controller("ProductsCtrl", function ($scope, $q, medicinesApi, suppliersApi)
   };
 
   vm.currentPage = 1;
-  vm.pageSize = 4;
+  vm.pageSize = 8;
   vm.totalPages = 1;
-  vm.pageSizeOptions = [4, 8, 12, 20];
+  vm.pageSizeOptions = [8, 12, 20];
 
   vm.showFilters = false;
   vm.filters = {
@@ -228,7 +228,25 @@ app.controller("ProductsCtrl", function ($scope, $q, medicinesApi, suppliersApi)
     var request;
 
     if (vm.modal.mode === "add") {
-      request = medicinesApi.create(payload);
+      request = medicinesApi.create(payload).then(function (res) {
+        var createdMedicine = (res && res.data && res.data[0]) || null;
+
+        if (!createdMedicine || !createdMedicine.medicine_id) {
+          return res;
+        }
+
+        var purchasePayload = {
+          supplier_id: Number(payload.supplier_id),
+          medicine_id: Number(createdMedicine.medicine_id),
+          quantity: Number(payload.quantity || 0),
+          price: Number(payload.price || 0),
+          purchase_date: new Date().toISOString()
+        };
+
+        return purchasesApi.createSafe(purchasePayload).then(function () {
+          return res;
+        });
+      });
     } else {
       request = medicinesApi.update(vm.modal.form.medicine_id, payload);
     }
@@ -274,8 +292,8 @@ app.controller("ProductsCtrl", function ($scope, $q, medicinesApi, suppliersApi)
       .catch(function (err) {
         alert(
           (err.data && err.data.message) ||
-            err.message ||
-            "Delete failed"
+          err.message ||
+          "Delete failed"
         );
       })
       .finally(function () {

@@ -2,6 +2,13 @@ app.service("suppliersApi", function ($http, apiConfig) {
   var baseUrl = apiConfig.baseUrl + "/suppliers";
   var headers = angular.copy(apiConfig.headers);
 
+  this.getForSuppliersPage = function () {
+    return $http.get(
+      baseUrl + "?select=supplier_id,name,contact,created_at&order=supplier_id.asc",
+      { headers: headers }
+    );
+  };
+
   this.getAll = function () {
     return $http.get(
       baseUrl + "?select=supplier_id,name&order=name.asc",

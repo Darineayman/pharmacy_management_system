@@ -136,9 +136,9 @@
               </td>
               <td class="text-center">
                 <div class="table-actions">
-                  <a ng-href="#!/app/invoices/{{ order.invoiceId }}" class="action-btn" title="View">
+                  <button class="action-btn" type="button" title="View" ng-click="dash.openViewInvoiceModal(order)">
                     <i class="fa-regular fa-eye"></i>
-                  </a>
+                  </button>
                   <button class="action-btn danger" type="button" title="Delete"
                     ng-click="dash.deleteInvoice(order.invoiceId)">
                     <i class="fa-regular fa-trash-can"></i>
@@ -155,5 +155,86 @@
       </div>
     </div>
 
+  </div>
+
+  <div class="modal fade" id="dashboardInvoiceDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content modal-dark">
+        <div class="modal-header">
+          <h5 class="modal-title">Invoice Details</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div ng-if="dash.invoiceView.loading" class="muted">
+            Loading invoice details...
+          </div>
+
+          <div ng-if="dash.invoiceView.error" class="helper">
+            {{ dash.invoiceView.error }}
+          </div>
+
+          <div ng-if="!dash.invoiceView.loading && dash.invoiceView.invoice">
+            <div class="invoice-meta-grid">
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Invoice Number</div>
+                <div class="invoice-meta-value">{{ dash.invoiceView.invoice.invoice_number || '—' }}</div>
+              </div>
+
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Customer</div>
+                <div class="invoice-meta-value">{{ dash.invoiceView.invoice.customer_name || 'Walk-in Customer' }}</div>
+              </div>
+
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Status</div>
+                <div class="invoice-meta-value">{{ dash.invoiceView.invoice.status || '—' }}</div>
+              </div>
+
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Total Amount</div>
+                <div class="invoice-meta-value">{{ dash.invoiceView.invoice.total_amount | currency:"$":2 }}</div>
+              </div>
+            </div>
+
+            <div class="invoice-items-wrap">
+              <table class="table table-darkx">
+                <thead>
+                  <tr>
+                    <th>Medicine</th>
+                    <th style="width: 110px">Qty</th>
+                    <th style="width: 140px">Unit Price</th>
+                    <th style="width: 150px">Line Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-if="dash.invoiceView.items.length === 0">
+                    <td colspan="4" class="empty-state">No invoice items found.</td>
+                  </tr>
+
+                  <tr ng-repeat="item in dash.invoiceView.items track by item.invoiceItem_id">
+                    <td>{{ item.medicine_name }}</td>
+                    <td class="muted">{{ item.quantity }}</td>
+                    <td class="muted">{{ item.unit_price | currency:"$":2 }}</td>
+                    <td class="muted">
+                      <div>{{ item.line_total | currency:"$":2 }}</div>
+                      <div class="line-total-breakdown" ng-if="item.quantity > 1">
+                        {{ item.quantity }} × {{ item.unit_price | currency:"$":2 }}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn" style="background-color: #0c4f4a; color: #fff" data-bs-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

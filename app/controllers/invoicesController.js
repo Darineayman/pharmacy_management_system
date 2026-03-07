@@ -37,9 +37,9 @@ app.controller(
     vm.showNewCustomerForm = false;
 
     vm.currentPage = 1;
-    vm.pageSize = 4;
+    vm.pageSize = 8;
     vm.totalPages = 1;
-    vm.pageSizeOptions = [4, 8, 12, 20];
+    vm.pageSizeOptions = [8, 12, 20];
 
     vm.invoiceView = {
       loading: false,
@@ -295,6 +295,103 @@ app.controller(
       );
     };
 
+    vm.validateInvoiceItemQuantities = function (items) {
+      var requestedByMedicine = {};
+      var medicineById = {};
+
+      vm.medicines.forEach(function (medicine) {
+        medicineById[String(medicine.medicine_id)] = medicine;
+      });
+
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var medicineId = String(item.medicine_id || "");
+        var requestedQty = Number(item.quantity || 0);
+
+        if (!medicineId || requestedQty <= 0) continue;
+
+        requestedByMedicine[medicineId] =
+          Number(requestedByMedicine[medicineId] || 0) + requestedQty;
+      }
+
+      var errors = [];
+      Object.keys(requestedByMedicine).forEach(function (medicineId) {
+        var medicine = medicineById[medicineId];
+        var medicineName =
+          (medicine && medicine.name) || "Selected medicine";
+        var availableQty = Number((medicine && medicine.quantity) || 0);
+        var requestedQty = Number(requestedByMedicine[medicineId] || 0);
+
+        if (!medicine) {
+          errors.push(medicineName + " is not available.");
+          return;
+        }
+
+        if (requestedQty > availableQty) {
+          errors.push(
+            medicineName +
+            ": requested " +
+            requestedQty +
+            ", available " +
+            availableQty +
+            "."
+          );
+        }
+      });
+
+      if (errors.length) {
+        return "Insufficient stock: " + errors.join(" ");
+      }
+
+      return "";
+    };
+
+    vm.getRequestedQtyByMedicine = function (items) {
+      var requestedByMedicine = {};
+
+      items.forEach(function (item) {
+        var medicineId = String(item.medicine_id || "");
+        var requestedQty = Number(item.quantity || 0);
+
+        if (!medicineId || requestedQty <= 0) return;
+
+        requestedByMedicine[medicineId] =
+          Number(requestedByMedicine[medicineId] || 0) + requestedQty;
+      });
+
+      return requestedByMedicine;
+    };
+
+    vm.decreaseMedicineStock = function (items) {
+      var requestedByMedicine = vm.getRequestedQtyByMedicine(items);
+      var medicineById = {};
+
+      vm.medicines.forEach(function (medicine) {
+        medicineById[String(medicine.medicine_id)] = medicine;
+      });
+
+      var updates = [];
+
+      Object.keys(requestedByMedicine).forEach(function (medicineId) {
+        var medicine = medicineById[medicineId];
+        if (!medicine) return;
+
+        var currentQty = Number(medicine.quantity || 0);
+        var requestedQty = Number(requestedByMedicine[medicineId] || 0);
+        var newQty = Math.max(0, currentQty - requestedQty);
+
+        updates.push(
+          medicinesApi.update(Number(medicineId), {
+            quantity: newQty,
+          })
+        );
+      });
+
+      return $q.all(updates).then(function () {
+        return vm.loadMedicinesForInvoice();
+      });
+    };
+
     vm.openCreateInvoice = function () {
       vm.resetInvoiceModal();
 
@@ -317,6 +414,12 @@ app.controller(
 
       if (!validItems.length) {
         vm.invoiceModal.error = "Please select medicines and quantities.";
+        return;
+      }
+
+      var stockValidationError = vm.validateInvoiceItemQuantities(validItems);
+      if (stockValidationError) {
+        vm.invoiceModal.error = stockValidationError;
         return;
       }
 
@@ -378,6 +481,9 @@ app.controller(
           });
 
           return invoiceItemsApi.createMany(itemPayloads);
+        })
+        .then(function () {
+          return vm.decreaseMedicineStock(validItems);
         })
         .then(function () {
           return vm.loadInvoices();

@@ -17,6 +17,7 @@
                     <div class="customer-stat-icon"><i class="fa-solid fa-users"></i></div>
                     <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                 </div>
+                <div class="stat-bg-icon"><i class="fa-solid fa-users"></i></div>
                 <div class="customer-stat-title">Total Customers</div>
                 <div class="customer-stat-value">{{ cust.stats.totalCustomers }}</div>
                 <div class="customer-stat-meta">All registered customers</div>
@@ -27,6 +28,7 @@
                     <div class="customer-stat-icon"><i class="fa-solid fa-crown"></i></div>
                     <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                 </div>
+                <div class="stat-bg-icon"><i class="fa-solid fa-crown"></i></div>
                 <div class="customer-stat-title">Loyal Customers</div>
                 <div class="customer-stat-value">{{ cust.stats.loyalCustomers }}</div>
                 <div class="customer-stat-meta">Loyalty points above 100</div>
@@ -37,6 +39,7 @@
                     <div class="customer-stat-icon"><i class="fa-solid fa-user-plus"></i></div>
                     <button class="card-dots-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                 </div>
+                <div class="stat-bg-icon"><i class="fa-solid fa-user-plus"></i></div>
                 <div class="customer-stat-title">New Customers</div>
                 <div class="customer-stat-value">{{ cust.stats.newCustomers }}</div>
                 <div class="customer-stat-meta">Joined in the last 30 days</div>
@@ -55,9 +58,9 @@
                 </div>
 
                 <div class="customers-toolbar-actions">
-                    <button class="add-customer-btn" ng-click="cust.openAddModal()">
-                        <i class="fa-solid fa-circle-plus"></i>
-                        Add New Customer
+                    <button class="add-medicine-btn" ng-click="cust.openAddModal()">
+                        <span class="add-icon">+</span>
+                        <span>Add New Customer</span>
                     </button>
 
                     <button class="filter-btn" ng-click="cust.toggleFilters()">
@@ -99,6 +102,13 @@
 
                 <div class="customers-filters-reset-wrap">
                     <button class="filter-btn" ng-click="cust.resetFilters()">Reset</button>
+                </div>
+            </div>
+
+            <div class="table-head">
+                <div class="table-title">Customers</div>
+                <div class="muted">
+                    Showing {{ cust.pagedCustomers.length }} items
                 </div>
             </div>
 
@@ -147,17 +157,27 @@
             </div>
 
             <!-- Pagination -->
-            <div class="customers-pagination-wrap">
-                <div class="customers-pagination-info">
-                    Showing
+            <div class="table-pagination">
+                <div class="pagination-info">
+                    <span>Showing</span>
                     <span class="customers-page-size">{{ cust.pagination.pageSize }}</span>
-                    out of {{ cust.filteredCustomers.length }}
+                    <span>out of {{ cust.filteredCustomers.length }}</span>
                 </div>
 
-                <div class="customers-pagination">
-                    <button ng-repeat="page in cust.getPageNumbers() track by page" class="customers-page-btn"
+                <div class="pagination-controls" ng-if="cust.pagination.totalPages > 1">
+                    <button class="page-btn nav-btn" ng-click="cust.changePage(cust.pagination.currentPage - 1)"
+                        ng-disabled="cust.pagination.currentPage === 1">
+                        ‹
+                    </button>
+
+                    <button ng-repeat="page in cust.getPageNumbers() track by page" class="page-btn"
                         ng-class="{active: cust.pagination.currentPage === page}" ng-click="cust.changePage(page)">
                         {{ page }}
+                    </button>
+
+                    <button class="page-btn nav-btn" ng-click="cust.changePage(cust.pagination.currentPage + 1)"
+                        ng-disabled="cust.pagination.currentPage === cust.pagination.totalPages">
+                        ›
                     </button>
                 </div>
             </div>
@@ -198,8 +218,8 @@
                 </div>
 
                 <div class="customers-modal-footer">
-                    <button class="filter-btn" ng-click="cust.closeAddModal()">Cancel</button>
-                    <button class="add-customer-btn" ng-click="cust.addCustomer()">Save</button>
+                    <button class="btn btn-ghost" ng-click="cust.closeAddModal()">Cancel</button>
+                    <button class="btn btn-primary" ng-click="cust.addCustomer()">Save</button>
                 </div>
             </div>
         </div>
@@ -239,8 +259,8 @@
                 </div>
 
                 <div class="customers-modal-footer">
-                    <button class="filter-btn" ng-click="cust.closeEditModal()">Cancel</button>
-                    <button class="add-customer-btn" ng-click="cust.updateCustomer()">Update</button>
+                    <button class="btn btn-ghost" ng-click="cust.closeEditModal()">Cancel</button>
+                    <button class="btn btn-primary" ng-click="cust.updateCustomer()">Update</button>
                 </div>
             </div>
         </div>

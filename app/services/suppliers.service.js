@@ -1,31 +1,17 @@
 (function () {
     angular.module('pharmly')
-        .service('SuppliersService', function (SupabaseClient) {
+        .service('SuppliersService', function ($q, suppliersApi, medicinesApi, purchasesApi) {
 
             this.getSuppliersPageData = async function () {
-                const [suppliersRes, medicinesRes, purchasesRes] = await Promise.all([
-                    SupabaseClient
-                        .from('suppliers')
-                        .select('*')
-                        .order('supplier_id', { ascending: true }),
-
-                    SupabaseClient
-                        .from('medicines')
-                        .select('medicine_id, supplier_id, name, quantity, category'),
-
-                    SupabaseClient
-                        .from('purchases')
-                        .select('purchase_id, supplier_id, medicine_id, quantity, price, purchase_date')
-                        .order('purchase_date', { ascending: false })
+                const responses = await $q.all([
+                    suppliersApi.getForSuppliersPage(),
+                    medicinesApi.getAll(),
+                    purchasesApi.getAll()
                 ]);
 
-                if (suppliersRes.error) throw suppliersRes.error;
-                if (medicinesRes.error) throw medicinesRes.error;
-                if (purchasesRes.error) throw purchasesRes.error;
-
-                const suppliers = suppliersRes.data || [];
-                const medicines = medicinesRes.data || [];
-                const purchases = purchasesRes.data || [];
+                const suppliers = (responses[0] && responses[0].data) || [];
+                const medicines = (responses[1] && responses[1].data) || [];
+                const purchases = (responses[2] && responses[2].data) || [];
 
                 const medicinesBySupplier = {};
                 medicines.forEach(function (med) {
@@ -143,35 +129,17 @@
             };
 
             this.createSupplier = async function (payload) {
-                const { data, error } = await SupabaseClient
-                    .from('suppliers')
-                    .insert([payload])
-                    .select()
-                    .single();
-
-                if (error) throw error;
-                return data;
+                const res = await suppliersApi.create(payload);
+                return (res.data && res.data[0]) || null;
             };
 
             this.updateSupplier = async function (supplierId, payload) {
-                const { data, error } = await SupabaseClient
-                    .from('suppliers')
-                    .update(payload)
-                    .eq('supplier_id', supplierId)
-                    .select()
-                    .single();
-
-                if (error) throw error;
-                return data;
+                const res = await suppliersApi.update(supplierId, payload);
+                return (res.data && res.data[0]) || null;
             };
 
             this.deleteSupplier = async function (supplierId) {
-                const { error } = await SupabaseClient
-                    .from('suppliers')
-                    .delete()
-                    .eq('supplier_id', supplierId);
-
-                if (error) throw error;
+                await suppliersApi.remove(supplierId);
                 return true;
             };
         });
