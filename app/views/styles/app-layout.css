@@ -165,6 +165,12 @@
     letter-spacing: -0.2px;
 }
 
+.topbar-user {
+    color: #344054;
+    font-size: 14px;
+    font-weight: 600;
+}
+
 /* =========================
    Content
    ========================= */
