@@ -86,6 +86,7 @@ app.controller(
           !q ||
           String(inv.invoice_number || "").toLowerCase().includes(q) ||
           String(inv.customer_name || "").toLowerCase().includes(q) ||
+          String(inv.customer_phone || "").toLowerCase().includes(q) ||
           String(inv.created_by_name || "").toLowerCase().includes(q);
 
         var matchesStatus =
@@ -161,7 +162,10 @@ app.controller(
 
           var customerMap = {};
           customers.forEach(function (c) {
-            customerMap[String(c.customer_id)] = c.full_name;
+            customerMap[String(c.customer_id)] = {
+              name: c.full_name,
+              phone: c.phone_number,
+            };
           });
 
           var userMap = {};
@@ -170,7 +174,10 @@ app.controller(
           });
 
           invoices.forEach(function (inv) {
-            inv.customer_name = customerMap[String(inv.customer_id)] || "";
+            var customer = customerMap[String(inv.customer_id)] || {};
+
+            inv.customer_name = customer.name || "";
+            inv.customer_phone = customer.phone || "";
             inv.created_by_name = userMap[String(inv.created_by)] || "";
           });
 
@@ -330,11 +337,11 @@ app.controller(
         if (requestedQty > availableQty) {
           errors.push(
             medicineName +
-            ": requested " +
-            requestedQty +
-            ", available " +
-            availableQty +
-            "."
+              ": requested " +
+              requestedQty +
+              ", available " +
+              availableQty +
+              "."
           );
         }
       });

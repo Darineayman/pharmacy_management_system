@@ -50,8 +50,13 @@
       <div class="toolbar toolbar-order-style">
         <div class="searchbox searchbox-order-style">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input class="search-input" type="text" placeholder="Search invoices..." ng-model="vm.q"
-            ng-change="vm.applyFilters()" />
+          <input
+            class="search-input"
+            type="text"
+            placeholder="Search invoice, customer, or phone..."
+            ng-model="vm.q"
+            ng-change="vm.applyFilters()"
+          />
         </div>
 
         <div class="toolbar-actions toolbar-actions-order-style">
@@ -112,6 +117,7 @@
               <tr>
                 <th>Invoice #</th>
                 <th>Customer</th>
+                <th>Phone</th>
                 <th>Created By</th>
                 <th>Payment Method</th>
                 <th>Status</th>
@@ -122,23 +128,35 @@
             </thead>
             <tbody>
               <tr ng-if="!vm.loading && vm.pagedItems.length === 0">
-                <td colspan="8" class="empty-state">No invoices found.</td>
+                <td colspan="9" class="empty-state">No invoices found.</td>
               </tr>
 
               <tr ng-repeat="inv in vm.pagedItems track by inv.invoice_id">
                 <td class="muted">
                   {{ inv.invoice_number || ('INV-' + inv.invoice_id) }}
                 </td>
+
                 <td>{{ inv.customer_name || 'Walk-in Customer' }}</td>
-                <td class="muted">{{ inv.created_by_name || '—' }}</td>
+
+                <td class="muted">
+                  {{ inv.customer_phone || '—' }}
+                </td>
+
+                <td class="muted">
+                  {{ inv.created_by_name || '—' }}
+                </td>
+
                 <td class="muted">{{ inv.payment_method || '—' }}</td>
 
                 <td>
-                  <span class="pill" ng-class="{
-                  'pill-ok': inv.status === 'paid',
-                  'pill-warn': inv.status === 'draft',
-                  'pill-bad': inv.status === 'cancelled'
-                }">
+                  <span
+                    class="pill"
+                    ng-class="{
+                      'pill-ok': inv.status === 'paid',
+                      'pill-warn': inv.status === 'draft',
+                      'pill-bad': inv.status === 'cancelled'
+                    }"
+                  >
                     {{ inv.status || '—' }}
                   </span>
                 </td>
@@ -148,10 +166,20 @@
 
                 <td>
                   <div class="table-actions">
-                    <button class="action-btn" title="View" type="button" ng-click="vm.openViewInvoiceModal(inv)">
+                    <button
+                      class="action-btn"
+                      title="View"
+                      type="button"
+                      ng-click="vm.openViewInvoiceModal(inv)"
+                    >
                       <i class="fa-regular fa-eye"></i>
                     </button>
-                    <button class="action-btn danger" title="Delete" ng-click="vm.confirmDelete(inv)">
+
+                    <button
+                      class="action-btn danger"
+                      title="Delete"
+                      ng-click="vm.confirmDelete(inv)"
+                    >
                       <i class="fa-regular fa-trash-can"></i>
                     </button>
                   </div>
@@ -165,26 +193,40 @@
           <div class="pagination-info">
             <span>Showing</span>
 
-            <select class="page-size-select" ng-model="vm.pageSize" ng-options="size for size in vm.pageSizeOptions"
-              ng-change="vm.changePageSize()"></select>
+            <select
+              class="page-size-select"
+              ng-model="vm.pageSize"
+              ng-options="size for size in vm.pageSizeOptions"
+              ng-change="vm.changePageSize()"
+            ></select>
 
             <span>out of {{ vm.filtered.length }}</span>
           </div>
 
           <div class="pagination-controls" ng-if="vm.totalPages > 1">
-            <button class="page-btn nav-btn" ng-click="vm.goToPage(vm.currentPage - 1)"
-              ng-disabled="vm.currentPage === 1">
+            <button
+              class="page-btn nav-btn"
+              ng-click="vm.goToPage(vm.currentPage - 1)"
+              ng-disabled="vm.currentPage === 1"
+            >
               ‹
             </button>
 
-            <button class="page-btn" ng-repeat="page in vm.getVisiblePages() track by $index"
+            <button
+              class="page-btn"
+              ng-repeat="page in vm.getVisiblePages() track by $index"
               ng-class="{ active: vm.currentPage === page, ellipsis: page === '...' }"
-              ng-click="page !== '...' && vm.goToPage(page)" ng-disabled="page === '...'">
+              ng-click="page !== '...' && vm.goToPage(page)"
+              ng-disabled="page === '...'"
+            >
               {{ page }}
             </button>
 
-            <button class="page-btn nav-btn" ng-click="vm.goToPage(vm.currentPage + 1)"
-              ng-disabled="vm.currentPage === vm.totalPages">
+            <button
+              class="page-btn nav-btn"
+              ng-click="vm.goToPage(vm.currentPage + 1)"
+              ng-disabled="vm.currentPage === vm.totalPages"
+            >
               ›
             </button>
           </div>
@@ -199,7 +241,12 @@
       <div class="modal-content modal-dark">
         <div class="modal-header">
           <h5 class="modal-title">Invoice Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
         </div>
 
         <div class="modal-body">
@@ -216,16 +263,21 @@
               <div class="invoice-meta-card">
                 <div class="invoice-meta-label">Invoice Number</div>
                 <div class="invoice-meta-value">
-                  {{ vm.invoiceView.invoice.invoice_number || ('INV-' +
-                  vm.invoiceView.invoice.invoice_id) }}
+                  {{ vm.invoiceView.invoice.invoice_number || ('INV-' + vm.invoiceView.invoice.invoice_id) }}
                 </div>
               </div>
 
               <div class="invoice-meta-card">
                 <div class="invoice-meta-label">Customer</div>
                 <div class="invoice-meta-value">
-                  {{ vm.invoiceView.invoice.customer_name || 'Walk-in Customer'
-                  }}
+                  {{ vm.invoiceView.invoice.customer_name || 'Walk-in Customer' }}
+                </div>
+              </div>
+
+              <div class="invoice-meta-card">
+                <div class="invoice-meta-label">Customer Phone</div>
+                <div class="invoice-meta-value">
+                  {{ vm.invoiceView.invoice.customer_phone || '—' }}
                 </div>
               </div>
 
@@ -278,15 +330,10 @@
                   <tr ng-repeat="item in vm.invoiceView.items track by item.invoiceItem_id">
                     <td>{{ item.medicine_name }}</td>
                     <td class="muted">{{ item.quantity }}</td>
-                    <td class="muted">
-                      {{ item.unit_price | currency:"$":2 }}
-                    </td>
+                    <td class="muted">{{ item.unit_price | currency:"$":2 }}</td>
                     <td class="muted">
                       <div>{{ item.line_total | currency:"$":2 }}</div>
-                      <div class="line-total-breakdown" ng-if="item.quantity > 1">
-                        {{ item.quantity }} × {{ item.unit_price |
-                        currency:"$":2 }}
-                      </div>
+                      
                     </td>
                   </tr>
                 </tbody>
@@ -296,7 +343,12 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn" style="background-color: #0c4f4a; color: #fff" data-bs-dismiss="modal">
+          <button
+            type="button"
+            class="btn"
+            style="background-color: #0c4f4a; color: #fff"
+            data-bs-dismiss="modal"
+          >
             Close
           </button>
         </div>
@@ -310,7 +362,12 @@
       <div class="modal-content modal-dark">
         <div class="modal-header">
           <h5 class="modal-title">Add New Invoice</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
         </div>
 
         <form ng-submit="vm.saveInvoice()" novalidate>
@@ -319,8 +376,11 @@
               <div class="col-md-4">
                 <label class="label">Customer</label>
 
-                <select class="input" ng-model="vm.invoiceModal.form.customer_id"
-                  ng-options="c.customer_id as c.full_name for c in vm.customers">
+                <select
+                  class="input"
+                  ng-model="vm.invoiceModal.form.customer_id"
+                  ng-options="c.customer_id as (c.full_name + ' - ' + (c.phone_number || 'No phone')) for c in vm.customers"
+                >
                   <option value="">Walk-in Customer</option>
                 </select>
               </div>
@@ -348,45 +408,78 @@
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <h6 class="mb-0">Invoice Items</h6>
 
-                <button type="button" class="btn btn-ghost add-item-btn" ng-click="vm.addInvoiceItemRow()">
+                <button
+                  type="button"
+                  class="btn btn-ghost add-item-btn"
+                  ng-click="vm.addInvoiceItemRow()"
+                >
                   <span class="add-item-icon">+</span>
                   <span>Add Item</span>
                 </button>
               </div>
 
-              <div class="invoice-item-row row g-3 mb-3" ng-repeat="item in vm.invoiceModal.form.items track by $index">
+              <div
+                class="invoice-item-row row g-3 mb-3"
+                ng-repeat="item in vm.invoiceModal.form.items track by $index"
+              >
                 <div class="col-md-5">
                   <label class="label">Medicine</label>
-                  <select class="input" ng-model="item.medicine_id"
-                    ng-options="m.medicine_id as m.name for m in vm.medicines" ng-change="vm.onMedicineChange(item)">
+                  <select
+                    class="input"
+                    ng-model="item.medicine_id"
+                    ng-options="m.medicine_id as m.name for m in vm.medicines"
+                    ng-change="vm.onMedicineChange(item)"
+                  >
                     <option value="">Select medicine…</option>
                   </select>
                 </div>
 
                 <div class="col-md-2">
                   <label class="label">Qty</label>
-                  <input class="input" type="number" min="1" ng-model="item.quantity"
-                    ng-change="vm.updateLineTotal(item)" />
+                  <input
+                    class="input"
+                    type="number"
+                    min="1"
+                    ng-model="item.quantity"
+                    ng-change="vm.updateLineTotal(item)"
+                  />
                 </div>
 
                 <div class="col-md-2">
                   <label class="label">Unit Price</label>
-                  <input class="input" type="number" ng-model="item.unit_price" readonly />
+                  <input
+                    class="input"
+                    type="number"
+                    ng-model="item.unit_price"
+                    readonly
+                  />
                 </div>
 
                 <div class="col-md-2">
                   <label class="label">Line Total</label>
-                  <input class="input" type="number" ng-model="item.line_total" readonly />
+                  <input
+                    class="input"
+                    type="number"
+                    ng-model="item.line_total"
+                    readonly
+                  />
                 </div>
 
                 <div class="col-md-1 d-flex align-items-end">
-                  <button type="button" class="action-btn danger" ng-click="vm.removeInvoiceItemRow($index)">
+                  <button
+                    type="button"
+                    class="action-btn danger"
+                    ng-click="vm.removeInvoiceItemRow($index)"
+                  >
                     <i class="fa-regular fa-trash-can"></i>
                   </button>
                 </div>
               </div>
 
-              <div class="empty-invoice-items" ng-if="vm.invoiceModal.form.items.length === 0">
+              <div
+                class="empty-invoice-items"
+                ng-if="vm.invoiceModal.form.items.length === 0"
+              >
                 No items yet. Click <strong>Add Item</strong> to start building
                 the invoice.
               </div>
@@ -409,7 +502,11 @@
               Cancel
             </button>
 
-            <button type="submit" class="btn btn-primary" ng-disabled="vm.invoiceModal.saving">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              ng-disabled="vm.invoiceModal.saving"
+            >
               {{ vm.invoiceModal.saving ? 'Saving...' : 'Save Invoice' }}
             </button>
           </div>
