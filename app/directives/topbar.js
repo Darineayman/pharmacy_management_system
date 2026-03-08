@@ -1,13 +1,22 @@
 app.directive("appTopbar", function (authService) {
   return {
     restrict: "E",
-    scope: { title: "<" }, // better than "=" here
-    template: `
-      <header class="topbar">
-        <h1 class="page-title">{{ title }}</h1>
-        <div class="topbar-user" ng-if="userName">Logged in as: {{ userName }}</div>
-      </header>
-    `,
+    scope: { title: "<" },
+template: `
+<header class="topbar">
+  <h1 class="page-title">{{ title }}</h1>
+
+  <div class="topbar-profile" ng-if="userName">
+      <div class="topbar-profile-avatar">
+        {{ userName.charAt(0).toUpperCase() }}
+      </div>
+
+      <div class="topbar-profile-name">
+        {{ userName }}
+      </div>
+  </div>
+</header>
+`,
     controller: function ($scope) {
       function setUserName(profile) {
         $scope.userName = (profile && profile.username) || "";
@@ -36,9 +45,7 @@ app.directive("appTopbar", function (authService) {
           localStorage.setItem("pharmly_profile", JSON.stringify(profile));
           setUserName(profile);
         })
-        .catch(function () {
-          // ignore profile fetch errors in topbar
-        });
+        .catch(function () {});
     },
   };
 });
