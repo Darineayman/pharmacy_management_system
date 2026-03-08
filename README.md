@@ -1,51 +1,4 @@
 
-```
-pharmacy_management_system
-├─ app
-│  ├─ app.js
-│  ├─ auth.service.js
-│  ├─ controllers
-│  │  └─ app-shell.js
-│  ├─ directives
-│  │  ├─ sidebar.js
-│  │  └─ topbar.js
-│  ├─ routes.js
-│  └─ views
-│     ├─ app
-│     │  ├─ customers.html
-│     │  ├─ dashboard.html
-│     │  ├─ invoice-details.html
-│     │  ├─ invoices.html
-│     │  ├─ product-details.html
-│     │  ├─ products.html
-│     │  ├─ shell.html
-│     │  └─ suppliers.html
-│     ├─ assets
-│     │  ├─ Logo2.png
-│     │  ├─ about.jpg
-│     │  ├─ hero.jpg
-│     │  ├─ landing_page.jpg
-│     │  ├─ logo.png
-│     │  └─ tealWall.jpg
-│     ├─ public
-│     │  ├─ landing.html
-│     │  ├─ login.html
-│     │  └─ signup.html
-│     └─ styles
-│        ├─ app-layout.css
-│        ├─ home.css
-│        ├─ nav.css
-│        ├─ public-layout.css
-│        ├─ signup.css
-│        └─ theme.css
-└─ index.html
-
-```
-
-
-
-
-
 ---
 
 # System Functionalities
@@ -69,7 +22,7 @@ Features include:
 - Sales analytics chart
 - Top-selling medicines visualization
 - Latest invoices table
-- Ability to delete invoices directly from the dashboard
+- Ability to view invoices directly from the dashboard
 
 ---
 
@@ -217,3 +170,59 @@ Possible future enhancements include:
 - Advanced reporting system
 - Barcode scanning support
 - Role-based access control
+
+---
+
+## Project Tree
+
+
+```
+pharmacy_management_system
+├─ README.md
+├─ app
+│  ├─ app.js
+│  ├─ auth.service.js
+│  ├─ controllers
+│  │  ├─ app-shell.js
+│  │  ├─ customersController.js
+│  │  ├─ dashboardController.js
+│  │  ├─ invoicesController.js
+│  │  ├─ landingController.js
+│  │  ├─ loginController.js
+│  │  ├─ productsController.js
+│  │  └─ suppliersController.js
+│  ├─ directives
+│  │  ├─ sidebar.js
+│  │  └─ topbar.js
+│  ├─ routes.js
+│  ├─ services
+│  │  ├─ api.config.js
+│  │  ├─ customers.api.js
+│  │  ├─ dashboard.api.js
+│  │  ├─ invoice-items.api.js
+│  │  ├─ invoices.api.js
+│  │  ├─ medicines.api.js
+│  │  ├─ purchases.api.js
+│  │  ├─ suppliers.api.js
+│  │  ├─ suppliers.service.js
+│  │  └─ users.api.js
+│  └─ views
+│     ├─ app
+│     │  ├─ customers.html
+│     │  ├─ dashboard.html
+│     │  ├─ invoices.html
+│     │  ├─ products.html
+│     │  ├─ shell.html
+│     │  └─ suppliers.html
+│     ├─ public
+│     │  ├─ landing.html
+│     │  ├─ login.html
+│     │  └─ signup.html
+│     └─ styles
+│        ├─ app-layout.css
+│        ├─ products.css
+│        ├─ public-layout.css
+│        └─ theme.css
+└─ index.html
+
+```
